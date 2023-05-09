@@ -1,0 +1,29 @@
+{
+  "name": "blockchainhydrogen",
+  "version": "1.0.0",
+  "description": "PA Project 2023",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DrOrgasmatron/BlockchainHydrogen.git"
+  },
+  "author": "Nicola Cosi",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/DrOrgasmatron/BlockchainHydrogen/issues"
+  },
+  "homepage": "https://github.com/DrOrgasmatron/BlockchainHydrogen#readme",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^2.0.2",
+    "@openzeppelin/hardhat-upgrades": "^1.24.0",
+    "hardhat": "^2.13.0"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.8.3",
+    "@openzeppelin/contracts-upgradeable": "^4.8.3",
+    "csv-writer": "^1.6.0"
+  }
+}
