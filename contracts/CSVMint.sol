@@ -65,9 +65,9 @@ contract CSVMint is
         return super.supportsInterface(interfaceId);
     }
 
-    mapping(uint256 => bytes32) private _csvHashes;
+    mapping(uint256 => string) private _csvHashes;
 
-    function mintCSV(bytes32 csvHash) public {
+    function mintCSV(string memory csvHash) public {
         uint256 tokenId = _tokenIdCounter.current();
         _tokenIdCounter.increment();
         _safeMint(msg.sender, tokenId);

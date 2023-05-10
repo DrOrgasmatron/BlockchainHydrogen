@@ -22,8 +22,12 @@ describe("CSVMint", function () {
 
         const CSVMint = await ethers.getContractFactory("CSVMint");
         const csvMint = await CSVMint.deploy();
+        /*
         globalCsvMint = csvMint;
         return { csvMint, owner, otherAccount };
+        */
+        const fixtureInstance = { csvMint, owner, otherAccount };
+        return fixtureInstance;
     }
 
     describe("Deployment", function () {
@@ -41,17 +45,20 @@ describe("CSVMint", function () {
         it("Should create a CSV file and hash it", async function () {
             hash = await machine1.run();
             expect(await hash).to.be.a('string');
+            console.log(`Hash: ${hash}`);
         });
     });
 
     describe("Mint NFT", function () {
         it("Should mint a token with the hash of the csv file", async function () {
-            await globalCsvMint.methods.mintCSV(hash).send({ from: accounts[0] });
+            const { csvMint, owner } = await loadFixture(deployCSVMintFixture);
+
+            await csvMint.mintCSV(hash);
 
             // Check that a new token was minted and assigned to the correct address
             const tokenId = 0; // Assuming the first token was minted
-            const tokenOwner = await globalCsvMint.methods.ownerOf(tokenId).call();
-            assert.equal(tokenOwner, accounts[0], "Token was not minted correctly");
+            const tokenOwner = await csvMint.ownerOf(tokenId);
+            expect(tokenOwner).to.equal(owner.address, "Token was not minted correctly");
 
             // Log success message
             console.log(`Token ${tokenId} minted for hash ${hash}`);
