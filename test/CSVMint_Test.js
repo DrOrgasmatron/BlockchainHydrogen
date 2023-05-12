@@ -15,13 +15,16 @@ describe("CSVMint", function () {
 
     let hash;
     let globalCsvMint;
+    let csvMint, owner, otherAccount;
 
     async function deployCSVMintFixture() {
         // Contracts are deployed using the first signer/account by default
-        const [owner, otherAccount] = await ethers.getSigners();
+        //const [owner, otherAccount] = await ethers.getSigners();
+        [owner, otherAccount] = await ethers.getSigners();
 
         const CSVMint = await ethers.getContractFactory("CSVMint");
-        const csvMint = await CSVMint.deploy();
+        //const csvMint = await CSVMint.deploy();
+        csvMint = await CSVMint.deploy();
         /*
         globalCsvMint = csvMint;
         return { csvMint, owner, otherAccount };
@@ -51,7 +54,7 @@ describe("CSVMint", function () {
 
     describe("Mint NFT", function () {
         it("Should mint a token with the hash of the csv file", async function () {
-            const { csvMint, owner } = await loadFixture(deployCSVMintFixture);
+            // const { csvMint, owner } = await loadFixture(deployCSVMintFixture);
 
             await csvMint.mintCSV(hash);
 
@@ -62,6 +65,20 @@ describe("CSVMint", function () {
 
             // Log success message
             console.log(`Token ${tokenId} minted for hash ${hash}`);
+
+
+
+        });
+    });
+
+    describe("Check CSV Token", function () {
+        it("Should check the csv hash with the token hash", async function () {
+            //const { csvMint, owner } = await loadFixture(deployCSVMintFixture);
+
+            console.log(await csvMint.getAllCSVToken());
+
+            expect(await csvMint.checkCSVToken(hash)).to.be.true;
+
 
         });
     });

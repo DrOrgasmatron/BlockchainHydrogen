@@ -65,11 +65,70 @@ contract CSVMint is
         return super.supportsInterface(interfaceId);
     }
 
-    mapping(uint256 => string) private _csvHashes;
+    //  mapping(uint256 => string) private _tokenHashes;
+    string[] private _tokenHashes;
+
+    event TokenMinted(
+        address indexed to,
+        uint256 indexed tokenId,
+        string csvHash
+    );
+
+    // converts uint to string
+    function uintToString(uint256 value) public pure returns (string memory) {
+        // Convert the uint256 to bytes
+        bytes memory buffer = new bytes(32);
+        assembly {
+            mstore(add(buffer, 32), value)
+        }
+
+        // Find the end of the number and resize the buffer
+        uint256 length = 0;
+        while (buffer[length + 32] != 0) {
+            length++;
+        }
+        bytes memory output = new bytes(length);
+
+        // Copy the bytes to the output buffer
+        for (uint256 i = 0; i < length; i++) {
+            output[i] = buffer[i + 32];
+        }
+
+        // Convert the bytes to a string
+        return string(output);
+    }
 
     function mintCSV(string memory csvHash) public {
         uint256 tokenId = _tokenIdCounter.current();
         _tokenIdCounter.increment();
         _safeMint(msg.sender, tokenId);
+        _tokenHashes.push(csvHash);
+        // _setTokenURI(tokenId, tokenURI);
+        // emit TokenMinted(msg.sender, tokenId, csvHash);
+    }
+
+    function checkCSVToken(string memory csvHash) public view returns (bool) {
+        for (uint i = 0; i < _tokenIdCounter.current(); i++) {
+            if (
+                keccak256(abi.encodePacked(csvHash)) ==
+                keccak256(abi.encodePacked(_tokenHashes[i]))
+            ) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    //WORK IN PROGRESS
+    function getCSVToken(uint256 tokenId) public view returns (string memory) {
+        return _tokenHashes[tokenId];
+    }
+
+    function getCSVTokenCount() public view returns (uint256) {
+        return _tokenIdCounter.current();
+    }
+
+    function getAllCSVToken() public view returns (string[] memory) {
+        return _tokenHashes;
     }
 }
