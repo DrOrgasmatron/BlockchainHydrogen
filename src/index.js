@@ -9,6 +9,8 @@ const abi = require('../artifacts/contracts/CSVMint.sol/CSVMint.json').abi;
 const connectButton = document.getElementById('connect-button');
 const addressValue = document.getElementById('address-value');
 const isConnectedValue = document.getElementById('is-connected-value');
+const contractName = document.getElementById('contract-name');
+const contractSymbol = document.getElementById('contract-symbol');
 
 let isConnected = false;
 let signer;
@@ -22,15 +24,19 @@ connectButton.addEventListener('click', async () => {
         signer = provider.getSigner();
         contract = new ethers.Contract(contractAddress, abi, signer);
 
+
+        const symbol = await contract.symbol();
+        contractSymbol.innerText = symbol;
+        const name = await contract.name();
+        contractName.innerText = name;
         const address = await signer.getAddress();
         addressValue.innerText = address;
         isConnectedValue.innerText = 'Connected';
         isConnected = true;
 
-        const symbol = await contract.symbol();
-        const name = await contract.name();
-        console.log(`Symbol: ${symbol}`);
-        console.log(`Name: ${name}`);
+
+        //console.log(`Symbol: ${symbol}`);
+        //console.log(`Name: ${name}`);
     } catch (error) {
         console.log(error);
         isConnectedValue.innerText = `Error occurred. ${error}`;
@@ -45,37 +51,7 @@ const dropzone = new Dropzone("#upload-form", {
     autoProcessQueue: false, // Disable automatic file upload
     maxFiles: 1 // Allow only one file to be dropped
 });
-/*
-dropzone.on("addedfile", async function (file) {
-    // Called when a file is added to the dropzone
 
-    // Read the file data
-    const reader = new FileReader();
-    reader.onload = async function (event) {
-        const fileData = event.target.result;
-
-        try {
-            if (!isConnected) {
-                alert('Connect to the wallet');
-                return;
-            }
-
-            // Call the smart contract function and pass the fileData as a parameter
-            const isCSVValid = await contract.checkCSVToken(fileData);
-
-            if (isCSVValid) {
-                alert("CSV is valid");
-            } else {
-                alert("CSV is not valid");
-            }
-        } catch (error) {
-            console.log(error);
-            alert("Error occurred while checking CSV");
-        }
-    };
-    reader.readAsText(file); // Read file as text
-});
-*/
 dropzone.on("addedfile", async function (file) {
     // Called when a file is added to the dropzone
 
@@ -104,11 +80,11 @@ dropzone.on("addedfile", async function (file) {
             if (isCSVValid) {
                 // Set Dropzone container background color to green if the CSV is valid
                 document.getElementById("upload-form").style.backgroundColor = "green";
-                alert("CSV is valid");
+                //alert("CSV is valid");
             } else {
                 // Set Dropzone container background color to red if the CSV is not valid
                 document.getElementById("upload-form").style.backgroundColor = "red";
-                alert("CSV is not valid");
+                //alert("CSV is not valid");
             }
         } catch (error) {
             console.log(error);
