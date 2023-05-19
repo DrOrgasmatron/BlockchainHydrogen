@@ -40,6 +40,7 @@ describe("CSVMint", function () {
             expect(total).to.equal(0);
             expect(await csvMint.name()).to.equal('CSVMint');
             expect(await csvMint.symbol()).to.equal('CSV');
+            //console.log(await csvMint.address);
 
         });
     });

@@ -5,7 +5,7 @@ class Machine1 extends Machine {
         super('Machine 1');
     }
 
-    run() {
+    async run() {
 
         // Set up data for csv file
         const data = [
@@ -15,7 +15,9 @@ class Machine1 extends Machine {
         ];
 
         // Create csv file with data
-        return this.createCsvFile(data, 1);
+        console.log(data);
+        return await this.createCsvFile(data, 1);
+
 
     }
 }
