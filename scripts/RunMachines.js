@@ -10,7 +10,7 @@ async function main() {
     const myContract = await hre.ethers.getContractAt("CSVMint", contractAddress);
     const symbol = await myContract.symbol();
     console.log(`Symbol: ${symbol}`);
-    await myContract.mintCSV(machine1.run());
+    await myContract.mintCSV(machine1.run(), machine1.readableDate());
     console.log(await myContract.getAllCSVToken());
 }
 

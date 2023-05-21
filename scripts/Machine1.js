@@ -7,11 +7,14 @@ class Machine1 extends Machine {
 
     async run() {
 
+        const datetime = this.readableDate();
+
         // Set up data for csv file
         const data = [
             ['John Doe', 28, 'New York'],
             ['Jane Smith', 34, 'Los Angeles'],
             ['Bob Johnson', 42, 'Chicago'],
+            [`${datetime}`, 11, 'NULL']
         ];
 
         // Create csv file with data

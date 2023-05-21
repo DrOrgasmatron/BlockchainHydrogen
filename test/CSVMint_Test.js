@@ -57,7 +57,7 @@ describe("CSVMint", function () {
         it("Should mint a token with the hash of the csv file", async function () {
             // const { csvMint, owner } = await loadFixture(deployCSVMintFixture);
 
-            await csvMint.mintCSV(hash);
+            await csvMint.mintCSV(machine1.run(), machine1.readableDate());
 
             // Check that a new token was minted and assigned to the correct address
             const tokenId = 0; // Assuming the first token was minted

@@ -11,6 +11,10 @@ const addressValue = document.getElementById('address-value');
 const isConnectedValue = document.getElementById('is-connected-value');
 const contractName = document.getElementById('contract-name');
 const contractSymbol = document.getElementById('contract-symbol');
+const contractAddressValue = document.getElementById('contract-address-value');
+const tokenId = document.getElementById('token-id');
+const csvHash = document.getElementById('csv-hash');
+const dateMinted = document.getElementById('date-minted');
 
 let isConnected = false;
 let signer;
@@ -25,15 +29,17 @@ connectButton.addEventListener('click', async () => {
         contract = new ethers.Contract(contractAddress, abi, signer);
 
 
-        const symbol = await contract.symbol();
-        contractSymbol.innerText = symbol;
-        const name = await contract.name();
-        contractName.innerText = name;
+
         const address = await signer.getAddress();
         addressValue.innerText = address;
         isConnectedValue.innerText = 'Connected';
         isConnected = true;
 
+        const symbol = await contract.symbol();
+        contractSymbol.innerText = symbol;
+        const name = await contract.name();
+        contractName.innerText = name;
+        contractAddressValue.innerText = contractAddress;
 
         //console.log(`Symbol: ${symbol}`);
         //console.log(`Name: ${name}`);
@@ -80,10 +86,25 @@ dropzone.on("addedfile", async function (file) {
             if (isCSVValid) {
                 // Set Dropzone container background color to green if the CSV is valid
                 document.getElementById("upload-form").style.backgroundColor = "green";
+                const tokenID = await contract.getTokenIDFromHash(hash);
+                const date = await contract.getTokenDateFromHash(hash);
+                //console.log(`Token ID: ${tokenID}`);
+                //console.log(`Hash: ${hash}`);
+                //console.log(`Date minted: ${dateMinted}`);
+                tokenId.innerText = tokenID;
+                csvHash.innerText = hash;
+                dateMinted.innerText = date;
+
+
+
                 //alert("CSV is valid");
             } else {
                 // Set Dropzone container background color to red if the CSV is not valid
                 document.getElementById("upload-form").style.backgroundColor = "red";
+                tokenId.innerText = "";
+                csvHash.innerText = "";
+                dateMinted.innerText = "";
+
                 //alert("CSV is not valid");
             }
         } catch (error) {

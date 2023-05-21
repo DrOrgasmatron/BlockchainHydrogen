@@ -10,19 +10,26 @@ class Machine {
         this.name = name;
     }
 
+    readableDate() {
+        // Get current date and time
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const hour = String(now.getHours()).padStart(2, '0');
+        const minute = String(now.getMinutes()).padStart(2, '0');
+        const second = String(now.getSeconds()).padStart(2, '0');
+
+        return `${year}-${month}-${day}-${hour}${minute}${second}`;
+    }
+
+
     createCsvFile(data, machineNumber) {
         return new Promise((resolve, reject) => {
             //console.log("In the promise of Machine.js");
 
+            const datetime = this.readableDate();
 
-            // Get current date and time
-            const now = new Date();
-            const year = now.getFullYear();
-            const month = String(now.getMonth() + 1).padStart(2, '0');
-            const day = String(now.getDate()).padStart(2, '0');
-            const hour = String(now.getHours()).padStart(2, '0');
-            const minute = String(now.getMinutes()).padStart(2, '0');
-            const second = String(now.getSeconds()).padStart(2, '0');
 
             // Set up headers for csv file
             const headers = [
@@ -31,9 +38,12 @@ class Machine {
                 { id: 'city', title: 'City' },
             ];
 
+            const headers2 = [];
+
 
             // Create csv writer and write data to file
-            const filename = `Machine${machineNumber}_${year}-${month}-${day}-${hour}${minute}${second}.csv`;
+            //const filename = `Machine${machineNumber}_${year}-${month}-${day}-${hour}${minute}${second}.csv`;
+            const filename = `Machine${machineNumber}_${datetime}.csv`;
             console.log(`Creating CSV file ${filename}...`);
             const csvPath = path.join(__dirname, '..', 'csvFiles', filename);
             // console.log(`after path.join`);
@@ -41,7 +51,7 @@ class Machine {
 
 
             const csvWriter = createCsvWriter({
-                header: headers,
+                header: headers2,
                 path: csvPath,
             });
             // console.log(`after createCsvWriter`);
