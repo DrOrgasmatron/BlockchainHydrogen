@@ -66,10 +66,20 @@ contract CSVMint is
         return super.supportsInterface(interfaceId);
     }
 
+    //transfer ownership of token
+    function transferTokenOwnership(uint256 tokenId, address newOwner) public {
+        require(
+            _isApprovedOrOwner(msg.sender, tokenId),
+            "Caller is not the owner or approved"
+        );
+        _transfer(msg.sender, newOwner, tokenId);
+    }
+
     struct CSVToken {
         uint256 tokenId;
         string csvHash;
         string date;
+        string issuer;
     }
 
     CSVToken[] private _tokenHashes;
@@ -84,8 +94,14 @@ contract CSVMint is
         uint256 tokenId = _tokenIdCounter.current();
         _tokenIdCounter.increment();
         _safeMint(msg.sender, tokenId);
+        string memory tokenIssuer = addressToString(msg.sender);
 
-        CSVToken memory newToken = CSVToken(tokenId, csvHash, date);
+        CSVToken memory newToken = CSVToken(
+            tokenId,
+            csvHash,
+            date,
+            tokenIssuer
+        );
         _tokenHashes.push(newToken);
         // _tokenHashes.push(csvHash);
         // _setTokenURI(tokenId, tokenURI);
@@ -157,29 +173,34 @@ contract CSVMint is
         }
     }
 
-    /*
-    // converts uint to string
-    function uintToString(uint256 value) public pure returns (string memory) {
-        // Convert the uint256 to bytes
-        bytes memory buffer = new bytes(32);
-        assembly {
-            mstore(add(buffer, 32), value)
+    function getTokenIssuerFromHash(
+        string memory csvHash
+    ) public view returns (string memory) {
+        for (uint256 i = 0; i < _tokenHashes.length; i++) {
+            if (
+                keccak256(abi.encodePacked(csvHash)) ==
+                keccak256(abi.encodePacked(_tokenHashes[i].csvHash))
+            ) {
+                return _tokenHashes[i].issuer;
+            }
         }
-
-        // Find the end of the number and resize the buffer
-        uint256 length = 0;
-        while (buffer[length + 32] != 0) {
-            length++;
-        }
-        bytes memory output = new bytes(length);
-
-        // Copy the bytes to the output buffer
-        for (uint256 i = 0; i < length; i++) {
-            output[i] = buffer[i + 32];
-        }
-
-        // Convert the bytes to a string
-        return string(output);
     }
-    */
+
+    function addressToString(
+        address _address
+    ) internal pure returns (string memory) {
+        bytes32 value = bytes32(uint256(uint160(_address)));
+        bytes memory alphabet = "0123456789abcdef";
+
+        bytes memory str = new bytes(42);
+        str[0] = "0";
+        str[1] = "x";
+
+        for (uint256 i = 0; i < 20; i++) {
+            str[2 + i * 2] = alphabet[uint8(value[i + 12] >> 4)];
+            str[3 + i * 2] = alphabet[uint8(value[i + 12] & 0x0f)];
+        }
+
+        return string(str);
+    }
 }

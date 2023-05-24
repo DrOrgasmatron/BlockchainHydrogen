@@ -83,4 +83,16 @@ describe("CSVMint", function () {
 
         });
     });
+
+    describe("Transfer CSV Token", function () {
+        it("Should transfer the token to a new address", async function () {
+            console.log("Actual owner of token: ", await csvMint.ownerOf(0));
+            console.log("Other account address: ", otherAccount.address);
+            await csvMint.transferTokenOwnership(0, otherAccount.address);
+            console.log("New owner of token: ", await csvMint.ownerOf(0));
+            expect(await csvMint.ownerOf(0)).to.equal(otherAccount.address, "Token was not transferred correctly");
+
+
+        });
+    });
 });
