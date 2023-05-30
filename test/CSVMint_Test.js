@@ -4,9 +4,7 @@ const {
 } = require("@nomicfoundation/hardhat-network-helpers");
 const { anyValue } = require("@nomicfoundation/hardhat-chai-matchers/withArgs");
 const { expect } = require("chai");
-//const createCsvWriter = require('csv-writer').createArrayCsvWriter;
 const fs = require('fs');
-//const crypto = require('crypto');
 const Machine1 = require("../scripts/Machine1");
 
 const machine1 = new Machine1();
@@ -19,16 +17,10 @@ describe("CSVMint", function () {
 
     async function deployCSVMintFixture() {
         // Contracts are deployed using the first signer/account by default
-        //const [owner, otherAccount] = await ethers.getSigners();
         [owner, otherAccount] = await ethers.getSigners();
-
         const CSVMint = await ethers.getContractFactory("CSVMint");
-        //const csvMint = await CSVMint.deploy();
         csvMint = await CSVMint.deploy();
-        /*
-        globalCsvMint = csvMint;
-        return { csvMint, owner, otherAccount };
-        */
+
         const fixtureInstance = { csvMint, owner, otherAccount };
         return fixtureInstance;
     }
@@ -40,8 +32,6 @@ describe("CSVMint", function () {
             expect(total).to.equal(0);
             expect(await csvMint.name()).to.equal('CSVMint');
             expect(await csvMint.symbol()).to.equal('CSV');
-            //console.log(await csvMint.address);
-
         });
     });
 
@@ -74,12 +64,8 @@ describe("CSVMint", function () {
 
     describe("Check CSV Token", function () {
         it("Should check the csv hash with the token hash", async function () {
-            //const { csvMint, owner } = await loadFixture(deployCSVMintFixture);
-
-            console.log(await csvMint.getAllCSVToken());
 
             expect(await csvMint.checkCSVToken(hash)).to.be.true;
-
 
         });
     });

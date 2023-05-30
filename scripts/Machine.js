@@ -26,29 +26,14 @@ class Machine {
 
     createCsvFile(data, machineNumber) {
         return new Promise((resolve, reject) => {
-            //console.log("In the promise of Machine.js");
-
             const datetime = this.readableDate();
-
-
-            // Set up headers for csv file
-            const headers = [
-                { id: 'name', title: 'Name' },
-                { id: 'age', title: 'Age' },
-                { id: 'city', title: 'City' },
-            ];
 
             const headers2 = [];
 
-
             // Create csv writer and write data to file
-            //const filename = `Machine${machineNumber}_${year}-${month}-${day}-${hour}${minute}${second}.csv`;
             const filename = `Machine${machineNumber}_${datetime}.csv`;
             console.log(`Creating CSV file ${filename}...`);
             const csvPath = path.join(__dirname, '..', 'csvFiles', filename);
-            // console.log(`after path.join`);
-
-
 
             const csvWriter = createCsvWriter({
                 header: headers2,

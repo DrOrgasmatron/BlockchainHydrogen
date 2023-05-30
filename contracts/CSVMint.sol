@@ -46,8 +46,6 @@ contract CSVMint is
         super._beforeTokenTransfer(from, to, tokenId, batchSize);
     }
 
-    // The following functions are overrides required by Solidity.
-
     function _burn(
         uint256 tokenId
     ) internal override(ERC721, ERC721URIStorage) {
@@ -103,9 +101,6 @@ contract CSVMint is
             tokenIssuer
         );
         _tokenHashes.push(newToken);
-        // _tokenHashes.push(csvHash);
-        // _setTokenURI(tokenId, tokenURI);
-        // emit TokenMinted(msg.sender, tokenId, csvHash);
     }
 
     //Check if hash exists

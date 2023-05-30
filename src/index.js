@@ -66,10 +66,7 @@ connectButton.addEventListener('click', async () => {
         contractAddressValue.innerText = contractAddress;
         contractOwner.innerText = await contract.owner();
 
-        //console.log(await contract.owner());
 
-        //console.log(`Symbol: ${symbol}`);
-        //console.log(`Name: ${name}`);
     } catch (error) {
         console.log(error);
         isConnectedValue.innerText = `Error occurred. ${error}`;
@@ -120,9 +117,6 @@ dropzone.on("addedfile", async function (file) {
                 const tokenID = await contract.getTokenIDFromHash(hash);
                 const date = await contract.getTokenDateFromHash(hash);
                 const tokenIssuerAddress = await contract.getTokenIssuerFromHash(hash);
-                //console.log(`Token ID: ${tokenID}`);
-                //console.log(`Hash: ${hash}`);
-                //console.log(`Date minted: ${dateMinted}`);
                 tokenId.innerText = tokenID;
                 csvHash.innerText = hash;
                 dateMinted.innerText = date;
