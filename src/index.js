@@ -11,10 +11,38 @@ const addressValue = document.getElementById('address-value');
 const isConnectedValue = document.getElementById('is-connected-value');
 const contractName = document.getElementById('contract-name');
 const contractSymbol = document.getElementById('contract-symbol');
+const contractAddressValue = document.getElementById('contract-address-value');
+const tokenId = document.getElementById('token-id');
+const csvHash = document.getElementById('csv-hash');
+const dateMinted = document.getElementById('date-minted');
+const tokenValidity = document.getElementById('token-validity');
+const contractOwner = document.getElementById('contract-owner');
+const tokenIssuer = document.getElementById('token-issuer');
+const tokenOwner = document.getElementById('token-owner');
+const newTokenOwner = document.getElementById('transfer-address');
+const transferTokenId = document.getElementById('transfer-token');
+const transferButton = document.getElementById('transfer-button');
+// Get the delete files button element
+const deleteFilesBtn = document.getElementById('delete-files-btn');
+
+
+const alertPlaceholder = document.getElementById('liveAlertPlaceholder')
+const appendAlert = (message, type) => {
+    const wrapper = document.createElement('div')
+    wrapper.innerHTML = [
+        `<div class="alert alert-${type} alert-dismissible" role="alert">`,
+        `   <div>${message}</div>`,
+        '   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>',
+        '</div>'
+    ].join('')
+
+    alertPlaceholder.append(wrapper)
+}
 
 let isConnected = false;
 let signer;
 let contract;
+let address = "";
 
 connectButton.addEventListener('click', async () => {
     try {
@@ -25,18 +53,20 @@ connectButton.addEventListener('click', async () => {
         contract = new ethers.Contract(contractAddress, abi, signer);
 
 
-        const symbol = await contract.symbol();
-        contractSymbol.innerText = symbol;
-        const name = await contract.name();
-        contractName.innerText = name;
-        const address = await signer.getAddress();
+
+        address = await signer.getAddress();
         addressValue.innerText = address;
         isConnectedValue.innerText = 'Connected';
         isConnected = true;
 
+        const symbol = await contract.symbol();
+        contractSymbol.innerText = symbol;
+        const name = await contract.name();
+        contractName.innerText = name;
+        contractAddressValue.innerText = contractAddress;
+        contractOwner.innerText = await contract.owner();
 
-        //console.log(`Symbol: ${symbol}`);
-        //console.log(`Name: ${name}`);
+
     } catch (error) {
         console.log(error);
         isConnectedValue.innerText = `Error occurred. ${error}`;
@@ -75,15 +105,44 @@ dropzone.on("addedfile", async function (file) {
 
             // Call the smart contract function and pass the fileData as a parameter
             const isCSVValid = await contract.checkCSVToken(hash);
+
+            console.log(await contract.ownerOf(0));
+
             console.log(await contract.getAllCSVToken());
+
 
             if (isCSVValid) {
                 // Set Dropzone container background color to green if the CSV is valid
                 document.getElementById("upload-form").style.backgroundColor = "green";
+                const tokenID = await contract.getTokenIDFromHash(hash);
+                const date = await contract.getTokenDateFromHash(hash);
+                const tokenIssuerAddress = await contract.getTokenIssuerFromHash(hash);
+                tokenId.innerText = tokenID;
+                csvHash.innerText = hash;
+                dateMinted.innerText = date;
+                tokenValidity.innerText = "Valid";
+                tokenValidity.style.color = "green";
+                tokenOwner.innerText = await contract.ownerOf(tokenID);
+                tokenIssuer.innerText = tokenIssuerAddress;
+
+                appendAlert('The csv file provided is valid', 'success')
+
+
+
                 //alert("CSV is valid");
             } else {
                 // Set Dropzone container background color to red if the CSV is not valid
                 document.getElementById("upload-form").style.backgroundColor = "red";
+                tokenValidity.innerText = "Invalid";
+                tokenValidity.style.color = "red";
+                tokenId.innerText = "";
+                csvHash.innerText = "";
+                dateMinted.innerText = "";
+                tokenIssuer.innerText = "";
+                tokenOwner.innerText = "";
+
+                appendAlert('The csv file provided is not valid', 'danger')
+
                 //alert("CSV is not valid");
             }
         } catch (error) {
@@ -103,11 +162,49 @@ dropzone.on("removedfile", function (file) {
 
 
 
-// Get the delete files button element
-const deleteFilesBtn = document.getElementById('delete-files-btn');
+
 
 // Add click event listener to the delete files button
 deleteFilesBtn.addEventListener('click', function () {
     // Remove all files from the Dropzone
     dropzone.removeAllFiles(true);
+    tokenValidity.innerText = "";
+    tokenId.innerText = "";
+    csvHash.innerText = "";
+    dateMinted.innerText = "";
+    tokenOwner.innerText = "";
+    tokenIssuer.innerText = "";
 });
+
+transferButton.addEventListener('click', async () => {
+    console.log("Transfer button clicked");
+    console.log("just trying to use contract:", contract.symbol());
+    try {
+        if (!isConnected) {
+            alert('Connect to the wallet');
+            return;
+        }
+        if (newTokenOwner.value == "") {
+            alert('Enter an address');
+            return;
+        }
+        if (transferTokenId.value == "") {
+            alert('Enter a token ID');
+            return;
+        }
+        if (address != await contract.ownerOf(transferTokenId.value)) {
+            alert('You do not own this token');
+            return;
+        }
+        console.log(`New token owner: ${newTokenOwner.value}`);
+        await contract.transferTokenOwnership(transferTokenId.value, newTokenOwner.value);
+
+    }
+    catch (error) {
+        console.log(error);
+        alert("Error occurred while transferring token");
+    }
+});
+
+
+

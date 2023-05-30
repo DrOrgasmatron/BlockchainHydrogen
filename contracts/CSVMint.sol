@@ -16,6 +16,7 @@ contract CSVMint is
     Ownable
 {
     using Counters for Counters.Counter;
+    using Strings for uint256;
 
     Counters.Counter private _tokenIdCounter;
 
@@ -45,8 +46,6 @@ contract CSVMint is
         super._beforeTokenTransfer(from, to, tokenId, batchSize);
     }
 
-    // The following functions are overrides required by Solidity.
-
     function _burn(
         uint256 tokenId
     ) internal override(ERC721, ERC721URIStorage) {
@@ -65,8 +64,23 @@ contract CSVMint is
         return super.supportsInterface(interfaceId);
     }
 
-    //  mapping(uint256 => string) private _tokenHashes;
-    string[] private _tokenHashes;
+    //transfer ownership of token
+    function transferTokenOwnership(uint256 tokenId, address newOwner) public {
+        require(
+            _isApprovedOrOwner(msg.sender, tokenId),
+            "Caller is not the owner or approved"
+        );
+        _transfer(msg.sender, newOwner, tokenId);
+    }
+
+    struct CSVToken {
+        uint256 tokenId;
+        string csvHash;
+        string date;
+        string issuer;
+    }
+
+    CSVToken[] private _tokenHashes;
 
     event TokenMinted(
         address indexed to,
@@ -74,44 +88,27 @@ contract CSVMint is
         string csvHash
     );
 
-    // converts uint to string
-    function uintToString(uint256 value) public pure returns (string memory) {
-        // Convert the uint256 to bytes
-        bytes memory buffer = new bytes(32);
-        assembly {
-            mstore(add(buffer, 32), value)
-        }
-
-        // Find the end of the number and resize the buffer
-        uint256 length = 0;
-        while (buffer[length + 32] != 0) {
-            length++;
-        }
-        bytes memory output = new bytes(length);
-
-        // Copy the bytes to the output buffer
-        for (uint256 i = 0; i < length; i++) {
-            output[i] = buffer[i + 32];
-        }
-
-        // Convert the bytes to a string
-        return string(output);
-    }
-
-    function mintCSV(string memory csvHash) public {
+    function mintCSV(string memory csvHash, string memory date) public {
         uint256 tokenId = _tokenIdCounter.current();
         _tokenIdCounter.increment();
         _safeMint(msg.sender, tokenId);
-        _tokenHashes.push(csvHash);
-        // _setTokenURI(tokenId, tokenURI);
-        // emit TokenMinted(msg.sender, tokenId, csvHash);
+        string memory tokenIssuer = addressToString(msg.sender);
+
+        CSVToken memory newToken = CSVToken(
+            tokenId,
+            csvHash,
+            date,
+            tokenIssuer
+        );
+        _tokenHashes.push(newToken);
     }
 
+    //Check if hash exists
     function checkCSVToken(string memory csvHash) public view returns (bool) {
-        for (uint i = 0; i < _tokenIdCounter.current(); i++) {
+        for (uint256 i = 0; i < _tokenHashes.length; i++) {
             if (
                 keccak256(abi.encodePacked(csvHash)) ==
-                keccak256(abi.encodePacked(_tokenHashes[i]))
+                keccak256(abi.encodePacked(_tokenHashes[i].csvHash))
             ) {
                 return true;
             }
@@ -119,16 +116,86 @@ contract CSVMint is
         return false;
     }
 
-    //WORK IN PROGRESS
     function getCSVToken(uint256 tokenId) public view returns (string memory) {
-        return _tokenHashes[tokenId];
+        require(tokenId < _tokenHashes.length, "Invalid tokenId");
+        return _tokenHashes[tokenId].csvHash;
     }
 
     function getCSVTokenCount() public view returns (uint256) {
-        return _tokenIdCounter.current();
+        return _tokenHashes.length;
     }
 
-    function getAllCSVToken() public view returns (string[] memory) {
+    function getAllCSVToken() public view returns (CSVToken[] memory) {
         return _tokenHashes;
+    }
+
+    function getTokenHashFromHash(
+        string memory csvHash
+    ) public view returns (string memory) {
+        for (uint256 i = 0; i < _tokenHashes.length; i++) {
+            if (
+                keccak256(abi.encodePacked(csvHash)) ==
+                keccak256(abi.encodePacked(_tokenHashes[i].csvHash))
+            ) {
+                return _tokenHashes[i].csvHash;
+            }
+        }
+    }
+
+    function getTokenIDFromHash(
+        string memory csvHash
+    ) public view returns (uint256) {
+        for (uint256 i = 0; i < _tokenHashes.length; i++) {
+            if (
+                keccak256(abi.encodePacked(csvHash)) ==
+                keccak256(abi.encodePacked(_tokenHashes[i].csvHash))
+            ) {
+                return _tokenHashes[i].tokenId;
+            }
+        }
+    }
+
+    function getTokenDateFromHash(
+        string memory csvHash
+    ) public view returns (string memory) {
+        for (uint256 i = 0; i < _tokenHashes.length; i++) {
+            if (
+                keccak256(abi.encodePacked(csvHash)) ==
+                keccak256(abi.encodePacked(_tokenHashes[i].csvHash))
+            ) {
+                return _tokenHashes[i].date;
+            }
+        }
+    }
+
+    function getTokenIssuerFromHash(
+        string memory csvHash
+    ) public view returns (string memory) {
+        for (uint256 i = 0; i < _tokenHashes.length; i++) {
+            if (
+                keccak256(abi.encodePacked(csvHash)) ==
+                keccak256(abi.encodePacked(_tokenHashes[i].csvHash))
+            ) {
+                return _tokenHashes[i].issuer;
+            }
+        }
+    }
+
+    function addressToString(
+        address _address
+    ) internal pure returns (string memory) {
+        bytes32 value = bytes32(uint256(uint160(_address)));
+        bytes memory alphabet = "0123456789abcdef";
+
+        bytes memory str = new bytes(42);
+        str[0] = "0";
+        str[1] = "x";
+
+        for (uint256 i = 0; i < 20; i++) {
+            str[2 + i * 2] = alphabet[uint8(value[i + 12] >> 4)];
+            str[3 + i * 2] = alphabet[uint8(value[i + 12] & 0x0f)];
+        }
+
+        return string(str);
     }
 }

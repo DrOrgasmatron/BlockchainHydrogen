@@ -22,15 +22,18 @@
             margin-bottom: 40px;
         }
 
-        fieldset {
-            border: none;
-            margin: 0 auto;
-            max-width: 400px;
-
-        }
 
         .btn-danger {
             width: 100%;
+        }
+
+        form {
+            border-style: solid;
+            border-color: black;
+            border-radius: 10px;
+            padding: 10px;
+
+
         }
     </style>
 </head>
@@ -38,39 +41,56 @@
 <body>
     <h1 style="color: white;">BLOCKCHAIN HYDROGEN</h1>
 
-    <div class="container" style="background-color: rgba(255, 255, 255, 0.697); padding: 20px; border-radius: 10px;">
-        <form>
-            <fieldset>
-                <legend>Wallet Details</legend>
-                <ul class="list-unstyled">
-                    <li>Address: <span id="address-value"></span></li>
-                    <li>isConnected: <span id="is-connected-value">click the button</span></li>
-                </ul>
-                <legend>Contract Details</legend>
-                <ul class="list-unstyled">
-                    <li>Contract name: <span id="contract-name"></span></li>
-                    <li>Contract symbol: <span id="contract-symbol"></span></li>
-                </ul>
-                <button type="button" class="btn btn-primary" id="connect-button">Connect</button>
-            </fieldset>
-        </form>
-
-        <!--
-        <div class="row mt-4">
-            <div class="col">
-                <form id="upload-form" class="dropzone"></form>
+    <div class="container" style="background-color: rgba(255, 255, 255, 0.697); padding: 20px; border-radius: 10px; ">
+        <div class="row">
+            <form class="col-md-6 ">
+                <fieldset>
+                    <legend>Wallet Details</legend>
+                    <ul class="list-unstyled">
+                        <li>Address: <span id="address-value"></span></li>
+                        <li>isConnected: <span id="is-connected-value">click the button</span></li>
+                    </ul>
+                    <legend>Contract Details</legend>
+                    <ul class="list-unstyled">
+                        <li>Contract name: <span id="contract-name"></span></li>
+                        <li>Contract symbol: <span id="contract-symbol"></span></li>
+                        <li>Contract address: <span id="contract-address-value"></span></li>
+                        <li>Contract owner: <span id="contract-owner"></span></li>
+                    </ul>
+                    <legend>Token Details</legend>
+                    <ul class="list-unstyled">
+                        <li>Token Validity: <span id="token-validity"></span></li>
+                        <li>Token ID: <span id="token-id"></span></li>
+                        <li>Token Issuer: <span id="token-issuer"></span></li>
+                        <li>Token Owner: <span id="token-owner"></span></li>
+                        <li>CSV Hash: <span id="csv-hash"></span></li>
+                        <li>Date Minted: <span id="date-minted"></span></li>
+                    </ul>
+                    <button type="button" class="btn btn-primary" id="connect-button">Connect</button>
+                </fieldset>
+            </form>
+            <form class="col-md-6">
+                <h2>Token Ownership Transfer</h2>
+                <div class="mb-3">
+                    <label for="transfer-token" class="form-label">Token to transfer:</label>
+                    <input type="number" class="form-control" id="transfer-token" placeholder="">
+                    <label for="transfer-address" class="form-label">Recipient address:</label>
+                    <input type="text" class="form-control" id="transfer-address" placeholder="">
+                    <button style="margin-top: 5px;" type="button" class="btn btn-primary" id="transfer-button">Transfer
+                        Token</button>
+            </form>
+            <div id="liveAlertPlaceholder"></div>
+            <div class="row mt-4">
+                <div class="col">
+                    <form id="upload-form" class="dropzone" style="border-radius: 10px;">
+                        <div class="dz-message">Drop files here or click to upload</div>
+                    </form>
+                </div>
             </div>
-        </div>-->
-        <div class="row mt-4">
-            <div class="col">
-                <form id="upload-form" class="dropzone">
-                    <div class="dz-message">Drop files here or click to upload</div>
-                </form>
-            </div>
-        </div>
-        <div style="margin-top: 5px;">
-            <div class="col">
-                <button class="btn btn-danger" id="delete-files-btn">Reset Files</button>
+            <div style="margin-top: 5px;">
+                <div class="col">
+                    <button class="btn btn-danger" id="delete-files-btn">Reset Files</button>
+                </div>
             </div>
         </div>
     </div>
