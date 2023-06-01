@@ -256,9 +256,12 @@ yarn-error.log
 
 # End of https://www.toptal.com/developers/gitignore/api/solidity,node,vuejs,react,soliditytruffle
 
+# Ignore all files inside the csvFiles folder
+csvFiles/*
 
-# ignore csv files created by the app
-csvFiles/
+# Exclude the empty csvFiles folder from being ignored
+!csvFiles/.gitkeep
+
 
 *.swp
 *.swo
