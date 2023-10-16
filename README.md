@@ -1,6 +1,6 @@
 # BlockchainHydrogen
 
-BlockchainHydrogen is a PA Project 2023 that implements a blockchain-based system for managing CSV (Comma-Separated Values) files as tokens on the Ethereum blockchain.
+BlockchainHydrogen is a TM Project 2023 that implements a blockchain-based system for managing CSV (Comma-Separated Values) files as tokens on the Ethereum blockchain.
 
 ## Table of Contents
 - [BlockchainHydrogen](#blockchainhydrogen)
