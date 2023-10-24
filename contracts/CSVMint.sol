@@ -26,6 +26,7 @@ contract CSVMint is
     using Strings for uint256;
 
     Counters.Counter private _tokenIdCounter;
+    Counters.Counter private _certificateTokenIdCounter;
 
     //constructor() ERC721("CSVMint", "CSV") {}
 
@@ -39,16 +40,6 @@ contract CSVMint is
         _grantRole(MINTER_ROLE, minter);
     }
 
-    /*
-    function pause() public onlyOwner {
-        _pause();
-    }
-
-    function unpause() public onlyOwner {
-        _unpause();
-    }
-    */
-
     function pause() public onlyRole(PAUSER_ROLE) {
         _pause();
     }
@@ -57,6 +48,7 @@ contract CSVMint is
         _unpause();
     }
 
+    //is not used
     function safeMint(
         address to,
         string memory uri
@@ -86,40 +78,6 @@ contract CSVMint is
         super._burn(tokenId);
     }
 
-    /*
-    function tokenURI(
-        uint256 tokenId
-    ) public view override(ERC721, ERC721URIStorage) returns (string memory) {
-        return super.tokenURI(tokenId);
-    }
-
-    function supportsInterface(
-        bytes4 interfaceId
-    ) public view override(ERC721, ERC721Enumerable) returns (bool) {
-        return super.supportsInterface(interfaceId);
-    }
-*/
-    // The following functions are overrides required by Solidity.
-    /*
-    function _update(
-        address to,
-        uint256 tokenId,
-        address auth
-    )
-        internal
-        override(ERC721, ERC721Enumerable, ERC721Pausable)
-        returns (address)
-    {
-        return super._update(to, tokenId, auth);
-    }
-
-    function _increaseBalance(
-        address account,
-        uint128 value
-    ) internal override(ERC721, ERC721Enumerable) {
-        super._increaseBalance(account, value);
-    }
-*/
     function tokenURI(
         uint256 tokenId
     ) public view override(ERC721, ERC721URIStorage) returns (string memory) {
@@ -152,10 +110,24 @@ contract CSVMint is
         string date;
         string issuer;
     }
-
     CSVToken[] private _tokenHashes;
 
     event TokenMinted(
+        address indexed to,
+        uint256 indexed tokenId,
+        string csvHash
+    );
+
+    struct CertificateToken {
+        uint256 tokenId;
+        string csvHash;
+        string date;
+        string issuer;
+    }
+
+    CertificateToken[] private _certificateTokenHashes;
+
+    event CertificateTokenMinted(
         address indexed to,
         uint256 indexed tokenId,
         string csvHash
@@ -174,6 +146,21 @@ contract CSVMint is
             tokenIssuer
         );
         _tokenHashes.push(newToken);
+    }
+
+    function mintCertificate(string memory csvHash, string memory date) public {
+        uint256 tokenId = _certificateTokenIdCounter.current();
+        _certificateTokenIdCounter.increment();
+        _safeMint(msg.sender, tokenId);
+        string memory tokenIssuer = addressToString(msg.sender);
+
+        CertificateToken memory newToken = CertificateToken(
+            tokenId,
+            csvHash,
+            date,
+            tokenIssuer
+        );
+        _certificateTokenHashes.push(newToken);
     }
 
     //Check if hash exists
@@ -272,3 +259,37 @@ contract CSVMint is
         return string(str);
     }
 }
+/*
+    function tokenURI(
+        uint256 tokenId
+    ) public view override(ERC721, ERC721URIStorage) returns (string memory) {
+        return super.tokenURI(tokenId);
+    }
+
+    function supportsInterface(
+        bytes4 interfaceId
+    ) public view override(ERC721, ERC721Enumerable) returns (bool) {
+        return super.supportsInterface(interfaceId);
+    }
+*/
+// The following functions are overrides required by Solidity.
+/*
+    function _update(
+        address to,
+        uint256 tokenId,
+        address auth
+    )
+        internal
+        override(ERC721, ERC721Enumerable, ERC721Pausable)
+        returns (address)
+    {
+        return super._update(to, tokenId, auth);
+    }
+
+    function _increaseBalance(
+        address account,
+        uint128 value
+    ) internal override(ERC721, ERC721Enumerable) {
+        super._increaseBalance(account, value);
+    }
+*/
