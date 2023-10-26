@@ -1,5 +1,6 @@
 const fsExtra = require('fs-extra');
 const path = require('path');
+const crypto = require('crypto');
 
 const inputDirectory = path.join(__dirname, '..', 'csvFiles'); // Replace with the directory where your CSV files are stored
 const outputDirectory = path.join(__dirname, '..', 'certificatesOutput'); // Replace with the directory where you want to save the aggregated CSV
@@ -10,6 +11,16 @@ fsExtra.ensureDirSync(outputDirectory);
 // Function to aggregate CSV files
 async function aggregateCSVFiles() {
     try {
+        // Get current date and time
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const hour = String(now.getHours()).padStart(2, '0');
+        const minute = String(now.getMinutes()).padStart(2, '0');
+        const second = String(now.getSeconds()).padStart(2, '0');
+        readableDate = `${year}-${month}-${day}-${hour}${minute}${second}`;
+
         // Get a list of CSV files in the input directory
         const csvFiles = fsExtra.readdirSync(inputDirectory).filter(file => file.endsWith('.csv'));
 
@@ -58,6 +69,27 @@ async function aggregateCSVFiles() {
         fsExtra.writeFileSync(outputPath, outputData.join('\n'));
 
         console.log(`Aggregated data saved to ${outputPath}`);
+
+        // Hash the content of the generated CSV file
+        const hash = crypto.createHash('sha256');
+        const input = fsExtra.createReadStream(outputPath);
+
+        input.on('readable', async () => {
+            const data = input.read();
+            if (data) {
+                hash.update(data);
+            } else {
+                const fileHash = hash.digest('hex');
+                console.log(`File hash: ${fileHash}`);
+
+                // Now, you can call the mintCSV function with the file hash
+                const myContract = await hre.ethers.getContractAt("CertificateMint", contractAddress);
+                const symbol = await myContract.symbol();
+                console.log(`Symbol: ${symbol}`);
+
+                await myContract.mintCertificate(fileHash, readableDate);
+            }
+        });
     } catch (err) {
         console.error('Error aggregating CSV files:', err);
     }

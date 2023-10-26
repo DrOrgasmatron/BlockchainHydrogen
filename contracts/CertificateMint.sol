@@ -11,7 +11,7 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 
 //import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract CSVMint is
+contract CertificateMint is
     ERC721,
     ERC721Enumerable,
     ERC721URIStorage,
@@ -33,7 +33,7 @@ contract CSVMint is
         address defaultAdmin,
         address pauser,
         address minter
-    ) ERC721("CSVMint", "CSV") {
+    ) ERC721("CertificateMint", "CRT") {
         _grantRole(DEFAULT_ADMIN_ROLE, defaultAdmin);
         _grantRole(PAUSER_ROLE, pauser);
         _grantRole(MINTER_ROLE, minter);
@@ -103,27 +103,28 @@ contract CSVMint is
         _transfer(msg.sender, newOwner, tokenId);
     }
 
-    struct CSVToken {
+    struct CertificateToken {
         uint256 tokenId;
         string csvHash;
         string date;
         string issuer;
     }
-    CSVToken[] private _tokenHashes;
 
-    event TokenMinted(
+    CertificateToken[] private _tokenHashes;
+
+    event CertificateTokenMinted(
         address indexed to,
         uint256 indexed tokenId,
         string csvHash
     );
 
-    function mintCSV(string memory csvHash, string memory date) public {
+    function mintCertificate(string memory csvHash, string memory date) public {
         uint256 tokenId = _tokenIdCounter.current();
         _tokenIdCounter.increment();
         _safeMint(msg.sender, tokenId);
         string memory tokenIssuer = addressToString(msg.sender);
 
-        CSVToken memory newToken = CSVToken(
+        CertificateToken memory newToken = CertificateToken(
             tokenId,
             csvHash,
             date,
@@ -133,7 +134,9 @@ contract CSVMint is
     }
 
     //Check if hash exists
-    function checkCSVToken(string memory csvHash) public view returns (bool) {
+    function checkCertificateToken(
+        string memory csvHash
+    ) public view returns (bool) {
         for (uint256 i = 0; i < _tokenHashes.length; i++) {
             if (
                 keccak256(abi.encodePacked(csvHash)) ==
@@ -145,16 +148,22 @@ contract CSVMint is
         return false;
     }
 
-    function getCSVToken(uint256 tokenId) public view returns (string memory) {
+    function getCertificateToken(
+        uint256 tokenId
+    ) public view returns (string memory) {
         require(tokenId < _tokenHashes.length, "Invalid tokenId");
         return _tokenHashes[tokenId].csvHash;
     }
 
-    function getCSVTokenCount() public view returns (uint256) {
+    function getCertificateTokenCount() public view returns (uint256) {
         return _tokenHashes.length;
     }
 
-    function getAllCSVToken() public view returns (CSVToken[] memory) {
+    function getAllCertificateToken()
+        public
+        view
+        returns (CertificateToken[] memory)
+    {
         return _tokenHashes;
     }
 
@@ -228,37 +237,3 @@ contract CSVMint is
         return string(str);
     }
 }
-/*
-    function tokenURI(
-        uint256 tokenId
-    ) public view override(ERC721, ERC721URIStorage) returns (string memory) {
-        return super.tokenURI(tokenId);
-    }
-
-    function supportsInterface(
-        bytes4 interfaceId
-    ) public view override(ERC721, ERC721Enumerable) returns (bool) {
-        return super.supportsInterface(interfaceId);
-    }
-*/
-// The following functions are overrides required by Solidity.
-/*
-    function _update(
-        address to,
-        uint256 tokenId,
-        address auth
-    )
-        internal
-        override(ERC721, ERC721Enumerable, ERC721Pausable)
-        returns (address)
-    {
-        return super._update(to, tokenId, auth);
-    }
-
-    function _increaseBalance(
-        address account,
-        uint128 value
-    ) internal override(ERC721, ERC721Enumerable) {
-        super._increaseBalance(account, value);
-    }
-*/
