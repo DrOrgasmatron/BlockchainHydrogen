@@ -6,32 +6,55 @@ const { anyValue } = require("@nomicfoundation/hardhat-chai-matchers/withArgs");
 const { expect } = require("chai");
 const fs = require('fs');
 const Machine1 = require("../scripts/Machine1");
+const CreateCertificate = require("../scripts/CreateCertificate");
 
 const machine1 = new Machine1();
 
 describe("CSVMint", function () {
 
     let hash;
+    let certifHash;
     let globalCsvMint;
+    let globalCertifMint;
     let csvMint, owner, otherAccount;
+    let certifMint, certifOwner, certifOtherAccount;
 
+    //CSVMint
     async function deployCSVMintFixture() {
         // Contracts are deployed using the first signer/account by default
         [owner, otherAccount] = await ethers.getSigners();
+        console.log("Owner: ", owner.address);
         const CSVMint = await ethers.getContractFactory("CSVMint");
-        csvMint = await CSVMint.deploy();
+        csvMint = await CSVMint.deploy(owner.address, owner.address, owner.address);
 
         const fixtureInstance = { csvMint, owner, otherAccount };
         return fixtureInstance;
     }
+    //CertifMint
+    async function deployCertifMintFixture() {
+        // Contracts are deployed using the first signer/account by default
+        [certifOwner, certifOtherAccount] = await ethers.getSigners();
+        console.log("CertifOwner: ", certifOwner.address);
+        const CertifMint = await ethers.getContractFactory("CertificateMint");
+        certifMint = await CertifMint.deploy(certifOwner.address, certifOwner.address, certifOwner.address);
+
+        const fixtureInstance = { certifMint, certifOwner, certifOtherAccount };
+        return fixtureInstance;
+    }
 
     describe("Deployment", function () {
-        it("Should has the correct name and symbol", async function () {
+        it("Should have the correct names and symbols", async function () {
             const { csvMint, owner } = await loadFixture(deployCSVMintFixture);
             const total = await csvMint.balanceOf(owner.address);
             expect(total).to.equal(0);
             expect(await csvMint.name()).to.equal('CSVMint');
             expect(await csvMint.symbol()).to.equal('CSV');
+
+            const { certifMint, certifOwner } = await loadFixture(deployCertifMintFixture);
+            const totalCertif = await csvMint.balanceOf(owner.address);
+            expect(totalCertif).to.equal(0);
+            expect(await certifMint.name()).to.equal('CertificateMint');
+            expect(await certifMint.symbol()).to.equal('CRT');
         });
     });
 
@@ -40,6 +63,9 @@ describe("CSVMint", function () {
             hash = await machine1.run();
             expect(await hash).to.be.a('string');
             console.log(`Hash: ${hash}`);
+
+            //Run the machine and create the CSV file a second time for a test later
+            await machine1.run();
         });
     });
 
@@ -57,8 +83,6 @@ describe("CSVMint", function () {
             // Log success message
             console.log(`Token ${tokenId} minted for hash ${hash}`);
 
-
-
         });
     });
 
@@ -70,6 +94,26 @@ describe("CSVMint", function () {
         });
     });
 
+
+    describe("Create Certificate", function () {
+        it("Should create a certificate using the existing csv files", async function () {
+            const { certifCreated, hashvalue } = await CreateCertificate.aggregateCSVFiles();
+            certifHash = hashvalue;
+            console.log("Certificate created: ", certifCreated);
+            console.log("Certificate hash: ", certifHash);
+            expect(certifCreated).to.be.true;
+        });
+    });
+
+    describe("Check Certificate Token", function () {
+        it("Should check the certificate hash with the token hash", async function () {
+
+            expect(await certifMint.checkCertificateToken(certifHash)).to.be.true;
+
+        });
+    });
+
+
     describe("Transfer CSV Token", function () {
         it("Should transfer the token to a new address", async function () {
             console.log("Actual owner of token: ", await csvMint.ownerOf(0));
@@ -77,6 +121,18 @@ describe("CSVMint", function () {
             await csvMint.transferTokenOwnership(0, otherAccount.address);
             console.log("New owner of token: ", await csvMint.ownerOf(0));
             expect(await csvMint.ownerOf(0)).to.equal(otherAccount.address, "Token was not transferred correctly");
+
+
+        });
+    });
+
+    describe("Transfer Certificate Token", function () {
+        it("Should transfer the token to a new address", async function () {
+            console.log("Actual owner of token: ", await certifMint.ownerOf(0));
+            console.log("Other account address: ", certifOtherAccount.address);
+            await certifMint.transferTokenOwnership(0, certifOtherAccount.address);
+            console.log("New owner of token: ", await certifMint.ownerOf(0));
+            expect(await certifMint.ownerOf(0)).to.equal(certifOtherAccount.address, "Token was not transferred correctly");
 
 
         });

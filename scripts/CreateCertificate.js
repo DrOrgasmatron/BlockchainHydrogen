@@ -8,10 +8,11 @@ const outputDirectory = path.join(__dirname, '..', 'certificatesOutput'); // Rep
 // Ensure the output directory exists
 fsExtra.ensureDirSync(outputDirectory);
 
+const contractAddress = "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512";
+
 // Function to aggregate CSV files
 async function aggregateCSVFiles() {
     try {
-        // Get current date and time
         const now = new Date();
         const year = now.getFullYear();
         const month = String(now.getMonth() + 1).padStart(2, '0');
@@ -19,9 +20,8 @@ async function aggregateCSVFiles() {
         const hour = String(now.getHours()).padStart(2, '0');
         const minute = String(now.getMinutes()).padStart(2, '0');
         const second = String(now.getSeconds()).padStart(2, '0');
-        readableDate = `${year}-${month}-${day}-${hour}${minute}${second}`;
+        const readableDate = `${year}-${month}-${day}-${hour}${minute}${second}`;
 
-        // Get a list of CSV files in the input directory
         const csvFiles = fsExtra.readdirSync(inputDirectory).filter(file => file.endsWith('.csv'));
 
         if (csvFiles.length === 0) {
@@ -29,18 +29,14 @@ async function aggregateCSVFiles() {
             return;
         }
 
-        // Initialize an array to hold the aggregated data
         let aggregatedData = [];
 
-
-        aggregatedData.push(`${new Date().toISOString()},CERTIFICATE OF CO2 OFFSET`);
         // Read and aggregate data from each CSV file
         for (const csvFile of csvFiles) {
             const filePath = path.join(inputDirectory, csvFile);
 
-            // Read the CSV file and aggregate data from the second column to the aggregatedData array
             const data = fsExtra.readFileSync(filePath, 'utf8').split('\n');
-            let isFirstRow = true; // Add this variable to track the first row
+            let isFirstRow = true;
 
             for (const row of data) {
                 if (row.trim() !== '') {
@@ -59,41 +55,70 @@ async function aggregateCSVFiles() {
             }
         }
 
-
-        // Create a new CSV file for the aggregated data
-        const outputFilename = 'AggregatedData.csv';
+        const outputFilename = 'Certificate' + readableDate + '.csv';
         const outputPath = path.join(outputDirectory, outputFilename);
 
-        // Write the aggregated data to the output file
         const outputData = Object.entries(aggregatedData).map(([key, value]) => `${key},${value}`);
         fsExtra.writeFileSync(outputPath, outputData.join('\n'));
 
         console.log(`Aggregated data saved to ${outputPath}`);
 
-        // Hash the content of the generated CSV file
-        const hash = crypto.createHash('sha256');
-        const input = fsExtra.createReadStream(outputPath);
+        const fileHash = await calculateFileHash(outputPath);
+        console.log(`File hash: ${fileHash}`);
 
-        input.on('readable', async () => {
-            const data = input.read();
-            if (data) {
-                hash.update(data);
-            } else {
-                const fileHash = hash.digest('hex');
-                console.log(`File hash: ${fileHash}`);
+        const certificateMinted = await mintCertificate(fileHash, readableDate);
+        if (certificateMinted) {
+            console.log('Certificate successfully minted.');
+            return { certifCreated: true, hashvalue: fileHash };
+        } else {
+            console.log('Certificate minting failed.');
+            return { certifCreated: false, hashvalue: null };
+        }
 
-                // Now, you can call the mintCSV function with the file hash
-                const myContract = await hre.ethers.getContractAt("CertificateMint", contractAddress);
-                const symbol = await myContract.symbol();
-                console.log(`Symbol: ${symbol}`);
-
-                await myContract.mintCertificate(fileHash, readableDate);
-            }
-        });
     } catch (err) {
         console.error('Error aggregating CSV files:', err);
+        return false;
     }
 }
 
+async function calculateFileHash(filePath) {
+    return new Promise((resolve, reject) => {
+        const hash = crypto.createHash('sha256');
+        const input = fsExtra.createReadStream(filePath);
+
+        input.on('data', (data) => {
+            hash.update(data);
+        });
+
+        input.on('end', () => {
+            const fileHash = hash.digest('hex');
+            resolve(fileHash);
+        });
+
+        input.on('error', (err) => {
+            reject(err);
+        });
+    });
+}
+
+async function mintCertificate(fileHash, date) {
+    try {
+        // Assuming hre is available in the scope where this script is executed
+        const myContract = await hre.ethers.getContractAt("CertificateMint", contractAddress);
+        const symbol = await myContract.symbol();
+        console.log(`Symbol: ${symbol}`);
+
+        await myContract.mintCertificate(fileHash, date);
+        return true;
+    } catch (err) {
+        console.error('Error minting certificate:', err);
+        return false;
+    }
+}
+
+module.exports = {
+    aggregateCSVFiles
+};
+
 // Call the function to start the aggregation process
-aggregateCSVFiles();
+//aggregateCSVFiles();

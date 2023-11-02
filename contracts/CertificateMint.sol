@@ -27,8 +27,6 @@ contract CertificateMint is
 
     Counters.Counter private _tokenIdCounter;
 
-    //constructor() ERC721("CSVMint", "CSV") {}
-
     constructor(
         address defaultAdmin,
         address pauser,
@@ -105,7 +103,7 @@ contract CertificateMint is
 
     struct CertificateToken {
         uint256 tokenId;
-        string csvHash;
+        string certifHash;
         string date;
         string issuer;
     }
@@ -115,10 +113,13 @@ contract CertificateMint is
     event CertificateTokenMinted(
         address indexed to,
         uint256 indexed tokenId,
-        string csvHash
+        string certifHash
     );
 
-    function mintCertificate(string memory csvHash, string memory date) public {
+    function mintCertificate(
+        string memory certifHash,
+        string memory date
+    ) public {
         uint256 tokenId = _tokenIdCounter.current();
         _tokenIdCounter.increment();
         _safeMint(msg.sender, tokenId);
@@ -126,7 +127,7 @@ contract CertificateMint is
 
         CertificateToken memory newToken = CertificateToken(
             tokenId,
-            csvHash,
+            certifHash,
             date,
             tokenIssuer
         );
@@ -135,12 +136,12 @@ contract CertificateMint is
 
     //Check if hash exists
     function checkCertificateToken(
-        string memory csvHash
+        string memory certifHash
     ) public view returns (bool) {
         for (uint256 i = 0; i < _tokenHashes.length; i++) {
             if (
-                keccak256(abi.encodePacked(csvHash)) ==
-                keccak256(abi.encodePacked(_tokenHashes[i].csvHash))
+                keccak256(abi.encodePacked(certifHash)) ==
+                keccak256(abi.encodePacked(_tokenHashes[i].certifHash))
             ) {
                 return true;
             }
@@ -152,7 +153,7 @@ contract CertificateMint is
         uint256 tokenId
     ) public view returns (string memory) {
         require(tokenId < _tokenHashes.length, "Invalid tokenId");
-        return _tokenHashes[tokenId].csvHash;
+        return _tokenHashes[tokenId].certifHash;
     }
 
     function getCertificateTokenCount() public view returns (uint256) {
@@ -168,25 +169,25 @@ contract CertificateMint is
     }
 
     function getTokenHashFromHash(
-        string memory csvHash
+        string memory certifHash
     ) public view returns (string memory) {
         for (uint256 i = 0; i < _tokenHashes.length; i++) {
             if (
-                keccak256(abi.encodePacked(csvHash)) ==
-                keccak256(abi.encodePacked(_tokenHashes[i].csvHash))
+                keccak256(abi.encodePacked(certifHash)) ==
+                keccak256(abi.encodePacked(_tokenHashes[i].certifHash))
             ) {
-                return _tokenHashes[i].csvHash;
+                return _tokenHashes[i].certifHash;
             }
         }
     }
 
     function getTokenIDFromHash(
-        string memory csvHash
+        string memory certifHash
     ) public view returns (uint256) {
         for (uint256 i = 0; i < _tokenHashes.length; i++) {
             if (
-                keccak256(abi.encodePacked(csvHash)) ==
-                keccak256(abi.encodePacked(_tokenHashes[i].csvHash))
+                keccak256(abi.encodePacked(certifHash)) ==
+                keccak256(abi.encodePacked(_tokenHashes[i].certifHash))
             ) {
                 return _tokenHashes[i].tokenId;
             }
@@ -194,12 +195,12 @@ contract CertificateMint is
     }
 
     function getTokenDateFromHash(
-        string memory csvHash
+        string memory certifHash
     ) public view returns (string memory) {
         for (uint256 i = 0; i < _tokenHashes.length; i++) {
             if (
-                keccak256(abi.encodePacked(csvHash)) ==
-                keccak256(abi.encodePacked(_tokenHashes[i].csvHash))
+                keccak256(abi.encodePacked(certifHash)) ==
+                keccak256(abi.encodePacked(_tokenHashes[i].certifHash))
             ) {
                 return _tokenHashes[i].date;
             }
@@ -207,12 +208,12 @@ contract CertificateMint is
     }
 
     function getTokenIssuerFromHash(
-        string memory csvHash
+        string memory certifHash
     ) public view returns (string memory) {
         for (uint256 i = 0; i < _tokenHashes.length; i++) {
             if (
-                keccak256(abi.encodePacked(csvHash)) ==
-                keccak256(abi.encodePacked(_tokenHashes[i].csvHash))
+                keccak256(abi.encodePacked(certifHash)) ==
+                keccak256(abi.encodePacked(_tokenHashes[i].certifHash))
             ) {
                 return _tokenHashes[i].issuer;
             }
