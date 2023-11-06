@@ -261,7 +261,11 @@ csvFiles/*
 
 # Exclude the empty csvFiles folder from being ignored
 !csvFiles/.gitkeep
+# Ignore all files inside the csvFiles folder
+certificatesOutput/*
 
+# Exclude the empty csvFiles folder from being ignored
+!certificatesOutput/.gitkeep
 
 *.swp
 *.swo

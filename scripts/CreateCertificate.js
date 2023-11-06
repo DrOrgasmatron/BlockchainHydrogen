@@ -8,11 +8,19 @@ const outputDirectory = path.join(__dirname, '..', 'certificatesOutput'); // Rep
 // Ensure the output directory exists
 fsExtra.ensureDirSync(outputDirectory);
 
-const contractAddress = "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512";
+const certifMintAddress = "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512";
+const csvMintAddress = "0x5fbdb2315678afecb367f032d93f642f64180aa3";
 
 // Function to aggregate CSV files
 async function aggregateCSVFiles() {
     try {
+        const csvMint = await hre.ethers.getContractAt("CSVMint", csvMintAddress);
+        const symbol = await csvMint.symbol();
+        console.log(`Symbol: ${symbol}`);
+
+
+
+
         const now = new Date();
         const year = now.getFullYear();
         const month = String(now.getMonth() + 1).padStart(2, '0');
@@ -34,6 +42,10 @@ async function aggregateCSVFiles() {
         // Read and aggregate data from each CSV file
         for (const csvFile of csvFiles) {
             const filePath = path.join(inputDirectory, csvFile);
+
+            //Check the validity of the file with the csvmint contract
+            const csvFileHash = await calculateFileHash(filePath);
+            console.log("File: " + filePath + " VALIDITY: " + await csvMint.checkCSVToken(csvFileHash));
 
             const data = fsExtra.readFileSync(filePath, 'utf8').split('\n');
             let isFirstRow = true;
@@ -104,7 +116,7 @@ async function calculateFileHash(filePath) {
 async function mintCertificate(fileHash, date) {
     try {
         // Assuming hre is available in the scope where this script is executed
-        const myContract = await hre.ethers.getContractAt("CertificateMint", contractAddress);
+        const myContract = await hre.ethers.getContractAt("CertificateMint", certifMintAddress);
         const symbol = await myContract.symbol();
         console.log(`Symbol: ${symbol}`);
 
