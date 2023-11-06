@@ -2,8 +2,8 @@ const fsExtra = require('fs-extra');
 const path = require('path');
 const crypto = require('crypto');
 
-const inputDirectory = path.join(__dirname, '..', 'csvFiles'); // Replace with the directory where your CSV files are stored
-const outputDirectory = path.join(__dirname, '..', 'certificatesOutput'); // Replace with the directory where you want to save the aggregated CSV
+const inputDirectory = path.join(__dirname, '..', 'csvFiles');
+const outputDirectory = path.join(__dirname, '..', 'certificatesOutput');
 
 // Ensure the output directory exists
 fsExtra.ensureDirSync(outputDirectory);
@@ -45,7 +45,15 @@ async function aggregateCSVFiles() {
 
             //Check the validity of the file with the csvmint contract
             const csvFileHash = await calculateFileHash(filePath);
-            console.log("File: " + filePath + " VALIDITY: " + await csvMint.checkCSVToken(csvFileHash));
+            if (await csvMint.checkCSVToken(csvFileHash)) {
+                console.log("File: " + filePath + " VALIDITY: " + await csvMint.checkCSVToken(csvFileHash));
+            } else {
+
+                console.log("File: " + filePath + " VALIDITY: " + await csvMint.checkCSVToken(csvFileHash));
+                //throw new Error('Invalid file found');
+                return { certifCreated: false, hashvalue: null };
+            }
+
 
             const data = fsExtra.readFileSync(filePath, 'utf8').split('\n');
             let isFirstRow = true;

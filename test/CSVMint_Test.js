@@ -5,8 +5,10 @@ const {
 const { anyValue } = require("@nomicfoundation/hardhat-chai-matchers/withArgs");
 const { expect } = require("chai");
 const fs = require('fs');
+const path = require('path');
 const Machine1 = require("../scripts/Machine1");
 const CreateCertificate = require("../scripts/CreateCertificate");
+
 
 const machine1 = new Machine1();
 
@@ -65,7 +67,7 @@ describe("CSVMint", function () {
             console.log(`Hash: ${hash}`);
 
             //Run the machine and create the CSV file a second time for a test later
-            await machine1.run();
+            //await machine1.run();
         });
     });
 
@@ -133,8 +135,53 @@ describe("CSVMint", function () {
             await certifMint.transferTokenOwnership(0, certifOtherAccount.address);
             console.log("New owner of token: ", await certifMint.ownerOf(0));
             expect(await certifMint.ownerOf(0)).to.equal(certifOtherAccount.address, "Token was not transferred correctly");
-
-
         });
     });
+
+
+    after(() => {
+        try {
+
+            console.log("DELETING FILES RIGHT NOW HEY HO HOH OHOHO HOH OH OH O");
+            // Define the path to the directories
+            const csvDirectory = path.join(__dirname, '..', 'csvFiles');
+            const certDirectory = path.join(__dirname, '..', 'certificatesOutput');
+
+            // Read the contents of the directory
+            const csvfiles = fs.readdirSync(csvDirectory);
+            const certfiles = fs.readdirSync(certDirectory);
+
+            // Filter files with the .csv extension and delete them
+            csvfiles.forEach(file => {
+                if (path.extname(file) === '.csv') {
+                    const filePath = path.join(csvDirectory, file);
+                    try {
+                        // Delete CSV file
+                        fs.unlinkSync(filePath);
+                        console.log(`Deleted CSV file: ${file}`);
+                    } catch (err) {
+                        console.error(`Error deleting CSV file ${file}: ${err}`);
+                    }
+                }
+            });
+            // Filter files with the .csv extension and delete them
+            certfiles.forEach(file => {
+                if (path.extname(file) === '.csv') {
+                    const filePath = path.join(certDirectory, file);
+                    try {
+                        // Delete CSV file
+                        fs.unlinkSync(filePath);
+                        console.log(`Deleted CSV file: ${file}`);
+                    } catch (err) {
+                        console.error(`Error deleting CSV file ${file}: ${err}`);
+                    }
+                }
+            });
+        } catch (err) {
+            console.error(`Error deleting files: ${err}`);
+        }
+    });
+
+
+
 });
