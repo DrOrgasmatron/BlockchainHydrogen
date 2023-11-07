@@ -142,7 +142,7 @@ describe("CSVMint", function () {
     after(() => {
         try {
 
-            console.log("DELETING FILES RIGHT NOW HEY HO HOH OHOHO HOH OH OH O");
+            console.log("DELETING FILES");
             // Define the path to the directories
             const csvDirectory = path.join(__dirname, '..', 'csvFiles');
             const certDirectory = path.join(__dirname, '..', 'certificatesOutput');
