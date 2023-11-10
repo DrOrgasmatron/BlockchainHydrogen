@@ -64,7 +64,7 @@ connectButton.addEventListener('click', async () => {
         const name = await contract.name();
         contractName.innerText = name;
         contractAddressValue.innerText = contractAddress;
-        contractOwner.innerText = await contract.owner();
+        // contractOwner.innerText = await contract.owner();
 
 
     } catch (error) {

@@ -124,11 +124,11 @@ async function calculateFileHash(filePath) {
 async function mintCertificate(fileHash, date) {
     try {
         // Assuming hre is available in the scope where this script is executed
-        const myContract = await hre.ethers.getContractAt("CertificateMint", certifMintAddress);
-        const symbol = await myContract.symbol();
+        const certifMint = await hre.ethers.getContractAt("CertificateMint", certifMintAddress);
+        const symbol = await certifMint.symbol();
         console.log(`Symbol: ${symbol}`);
 
-        await myContract.mintCertificate(fileHash, date);
+        await certifMint.mintCertificate(fileHash, date);
         return true;
     } catch (err) {
         console.error('Error minting certificate:', err);
