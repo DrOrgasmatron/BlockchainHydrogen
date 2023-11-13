@@ -8,12 +8,17 @@ const outputDirectory = path.join(__dirname, '..', 'certificatesOutput');
 // Ensure the output directory exists
 fsExtra.ensureDirSync(outputDirectory);
 
-const certifMintAddress = "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512";
-const csvMintAddress = "0x5fbdb2315678afecb367f032d93f642f64180aa3";
+//const certifMintAddress = "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512"; //local hardhat
+//const csvMintAddress = "0x5fbdb2315678afecb367f032d93f642f64180aa3"; //local hardhat
+
+const certifMintAddress = "0x41722243a594BD56Ca059373107CD1Da1E77d4ED"; //Sepolia
+const csvMintAddress = "0x9d6F63ca01be1f5a0f790Be32cD4cFa12d29754F"; //Sepolia
 
 // Function to aggregate CSV files
 async function aggregateCSVFiles() {
     try {
+        console.log('BEGINNING OF AGGREGATION PROCESS');
+
         const csvMint = await hre.ethers.getContractAt("CSVMint", csvMintAddress);
         const symbol = await csvMint.symbol();
         console.log(`Symbol: ${symbol}`);
@@ -141,4 +146,4 @@ module.exports = {
 };
 
 // Call the function to start the aggregation process
-//aggregateCSVFiles();
+aggregateCSVFiles();
