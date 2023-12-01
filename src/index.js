@@ -3,7 +3,9 @@ import { ethers } from 'ethers';
 // Connect to the Ethereum network using ethers
 const provider = new ethers.providers.Web3Provider(window.ethereum);
 
-const contractAddress = '0x5fbdb2315678afecb367f032d93f642f64180aa3';
+//const contractAddress = '0x5fbdb2315678afecb367f032d93f642f64180aa3'; //local hardhat
+const contractAddress = '0x9d6F63ca01be1f5a0f790Be32cD4cFa12d29754F'; //Sepolia
+
 const abi = require('../artifacts/contracts/CSVMint.sol/CSVMint.json').abi;
 
 const connectButton = document.getElementById('connect-button');
@@ -64,7 +66,7 @@ connectButton.addEventListener('click', async () => {
         const name = await contract.name();
         contractName.innerText = name;
         contractAddressValue.innerText = contractAddress;
-        contractOwner.innerText = await contract.owner();
+        // contractOwner.innerText = await contract.owner();
 
 
     } catch (error) {

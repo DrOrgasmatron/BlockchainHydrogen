@@ -264,6 +264,8 @@ csvFiles/*
 # Ignore all files inside the csvFiles folder
 certificatesOutput/*
 
+scriptsAWS/*
+
 # Exclude the empty csvFiles folder from being ignored
 !certificatesOutput/.gitkeep
 

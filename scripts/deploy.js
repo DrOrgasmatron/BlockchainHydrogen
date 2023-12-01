@@ -13,12 +13,11 @@ async function main() {
   let defaultAdmin = contractOwner[0].address;
   let pauser = contractOwner[0].address;
   let minter = contractOwner[0].address;
-  // Hardhat helper to get the ethers contractFactory object
-  const CSVMint = await ethers.getContractFactory('CSVMint');
-  const CertificateMint = await ethers.getContractFactory('CertificateMint');
 
   // Deploy the CSVMINT contract
   console.log('Deploying CSVMint...');
+  // Hardhat helper to get the ethers contractFactory object
+  const CSVMint = await ethers.getContractFactory('CSVMint');
   //const csvmint = await CSVMint.deploy();
   const csvmint = await CSVMint.deploy(defaultAdmin, pauser, minter);
   await csvmint.deployed();
@@ -26,10 +25,19 @@ async function main() {
 
   // Deploy the CertificateMint contract
   console.log('Deploying CertificateMint...');
+  const CertificateMint = await ethers.getContractFactory('CertificateMint');
   //const csvmint = await CSVMint.deploy();
   const certifmint = await CertificateMint.deploy(defaultAdmin, pauser, minter);
   await certifmint.deployed();
   console.log(`CertificateMint deployed to: ${certifmint.address}`);
+
+
+  // Deploy the CertificateMarket contract
+  console.log('Deploying CertificateMarket...');
+  const CertificateMarket = await ethers.getContractFactory('CertificateMarket');
+  const certifmarket = await CertificateMarket.deploy(certifmint.address);
+  await certifmarket.deployed();
+  console.log(`CertificateMarket deployed to: ${certifmarket.address}`);
 }
 
 // We recommend this pattern to be able to use async/await everywhere

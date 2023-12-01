@@ -12,7 +12,7 @@ const CreateCertificate = require("../scripts/CreateCertificate");
 
 const machine1 = new Machine1();
 
-describe("CSVMint", function () {
+describe("Contracts Tests", function () {
 
     let hash;
     let certifHash;
@@ -116,8 +116,107 @@ describe("CSVMint", function () {
     });
 
 
+
+    describe("CertificateMarket", function () {
+        let market, marketOwner, otherAccount;
+        // let certifMint, certifOwner, certifOtherAccount;
+        let tokenId = 0; // Example tokenId, adjust as needed
+
+        // Deploy CertificateMarket
+        async function deployCertificateMarketFixture() {
+            [marketOwner, otherAccount] = await ethers.getSigners();
+            const CertificateMarket = await ethers.getContractFactory("CertificateMarket");
+
+            // Deploy CertificateMarket contract
+            market = await CertificateMarket.deploy(certifMint.address);
+
+            return { market, marketOwner, otherAccount };
+        }
+
+        describe("Market Deployment", function () {
+            it("Should deploy the market contract", async function () {
+                const { market, marketOwner } = await loadFixture(deployCertificateMarketFixture);
+                expect(market.address).to.properAddress;
+            });
+        });
+
+        describe("List NFT for Sale", function () {
+            it("Should list an NFT for sale", async function () {
+
+                const salePrice = ethers.utils.parseEther("1"); // 1 ETH for example
+
+                console.log("SALE PRICE", salePrice);
+
+                // Approve the market contract to transfer NFT
+                await certifMint.connect(marketOwner).approve(market.address, tokenId);
+
+                // List the NFT for sale
+                await market.connect(marketOwner).listTokenForSale(tokenId, salePrice);
+
+                // Check if NFT is listed for sale
+                console.log(await market.tokenSales(tokenId));
+                const sale = await market.tokenSales(tokenId);
+                expect(sale.price).to.equal(salePrice);
+            });
+        });
+
+        describe("Cancel Sale", function () {
+            it("Should allow a seller to cancel a sale", async function () {
+
+
+                // Cancel the sale
+                await market.connect(marketOwner).cancelSale(tokenId);
+
+                // Check if the sale is cancelled
+                const sale = await market.tokenSales(tokenId);
+                expect(sale.price).to.equal(0);
+            });
+        });
+
+        describe("List NFT for Sale Again", function () {
+            it("Should list an NFT for sale", async function () {
+
+                const salePrice = ethers.utils.parseEther("1"); // 1 ETH for example
+
+                console.log("SALE PRICE", salePrice);
+
+                // Approve the market contract to transfer NFT
+                await certifMint.connect(marketOwner).approve(market.address, tokenId);
+
+                // List the NFT for sale
+                await market.connect(marketOwner).listTokenForSale(tokenId, salePrice);
+
+                // Check if NFT is listed for sale
+                console.log(await market.tokenSales(tokenId));
+                const sale = await market.tokenSales(tokenId);
+                expect(sale.price).to.equal(salePrice);
+            });
+        });
+
+
+        describe("Buy NFT", function () {
+            it("Should allow a user to buy a listed NFT", async function () {
+
+                const salePrice = ethers.utils.parseEther("1"); // Same as the list price
+                const sale = await market.tokenSales(tokenId);
+                console.log("SALE", sale);
+                // Buyer buys the NFT
+                console.log("actual owner of token", await certifMint.ownerOf(tokenId));
+                console.log("OTHER ACCOUNT ADDRESS", otherAccount.address);
+                await market.connect(otherAccount).buyToken(tokenId, { value: salePrice });
+
+                // Check new owner of the NFT
+                const newOwner = await certifMint.ownerOf(tokenId);
+                console.log("new owner of token", newOwner);
+                expect(newOwner).to.equal(otherAccount.address);
+            });
+        });
+
+
+    });
+
     describe("Transfer CSV Token", function () {
-        it("Should transfer the token to a new address", async function () {
+        it("Should transfer the csv token to a new address", async function () {
             console.log("Actual owner of token: ", await csvMint.ownerOf(0));
             console.log("Other account address: ", otherAccount.address);
             await csvMint.transferTokenOwnership(0, otherAccount.address);
@@ -127,17 +226,18 @@ describe("CSVMint", function () {
 
         });
     });
-
-    describe("Transfer Certificate Token", function () {
-        it("Should transfer the token to a new address", async function () {
-            console.log("Actual owner of token: ", await certifMint.ownerOf(0));
-            console.log("Other account address: ", certifOtherAccount.address);
-            await certifMint.transferTokenOwnership(0, certifOtherAccount.address);
-            console.log("New owner of token: ", await certifMint.ownerOf(0));
-            expect(await certifMint.ownerOf(0)).to.equal(certifOtherAccount.address, "Token was not transferred correctly");
+    /*
+    The transfer is now handled by the CertificateMarket contract
+        describe("Transfer Certificate Token", function () {
+            it("Should transfer the certificate token to a new address", async function () {
+                console.log("Actual owner of token: ", await certifMint.ownerOf(0));
+                console.log("Other account address: ", certifOtherAccount.address);
+                await certifMint.transferTokenOwnership(0, certifOtherAccount.address);
+                console.log("New owner of token: ", await certifMint.ownerOf(0));
+                expect(await certifMint.ownerOf(0)).to.equal(certifOtherAccount.address, "Token was not transferred correctly");
+            });
         });
-    });
-
+    */
 
     after(() => {
         try {
