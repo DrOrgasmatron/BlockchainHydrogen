@@ -1,3 +1,9 @@
+console.log('listCertificatesOnSale.js loaded');
+let isUserAdminGlobal = false;
+document.addEventListener('adminCheckComplete', (event) => {
+    console.log('Is user admin:', event.detail); // event.detail contains the isAdmin value
+    isUserAdminGlobal = event.detail;
+});
 
 function fetchFileList() {
     fetch('https://hka780hii3.execute-api.eu-central-1.amazonaws.com/beta/get-certificates')
@@ -19,14 +25,16 @@ function fetchFileList() {
             console.log('Parsed files:', filesToDisplay); // Log the parsed files
 
             const listGroup = document.querySelector('.list-group');
+            listGroup.innerHTML = '';
 
             filesToDisplay.forEach(file => {
                 console.log('inside the foreache');
                 // Process each file
                 console.log('File:', file);
 
-                if (file.isValid == true) {
-                    if (file.isListedForSale == false) {
+
+                if (isUserAdminGlobal == true) {
+                    if (file.isValid == true && file.isListedForSale == true) {
 
                         const listItem = document.createElement('li');
                         listItem.className = 'list-group-item list-group-item';
@@ -44,46 +52,22 @@ function fetchFileList() {
                 <br />
                 <small class="text-body-secondary">Is listed for Sale: ${file.isListedForSale}</small>
                 <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                <button id="btnSellCertificate" type="button" class="btn btn-warning btn-sm" data-tokenID="${file.tokenID}"  style="margin-bottom: 10px;">Sell Certificate</button>
+                <button id="btnSellCertificate" type="button" class="btn btn-danger btn-sm" data-tokenID="${file.tokenID}"  style="margin-bottom: 10px;">CANCEL SALE</button>
                 </div>         
                 `;
                         listGroup.appendChild(listItem);
-                    }
-                    else {
-
-
-                        const listItem = document.createElement('li');
-                        listItem.className = 'list-group-item list-group-item';
-                        listItem.innerHTML = `
-        <div class="d-flex w-100 justify-content-between ">
-                    <small class="text-body-secondary">id: ${file.tokenID}</small>
-                    <h6 class="mb-1">${file.fileName}</h6> 
-                    <p class="mb-1" style="color: green">Validity: ${file.isValid}</p>
-                </div>
-                
-                <br />
-                <small class="text-body-secondary">issuer: ${file.tokenIssuerAddress}</small>
-                <br />
-                <small class="text-body-secondary">Owner: ${file.tokenOwner}</small>
-                <br />
-                <small class="text-body-secondary">Is listed for Sale: ${file.isListedForSale}</small>
-                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                <button id="btnSellCertificate" type="button" class="btn btn-warning btn-sm disabled" style="margin-bottom: 10px;">Sell Certificate</button>
-                </div>         
-                `;
-                        listGroup.appendChild(listItem);
-
                     }
                 }
-
                 else {
-                    const listItem = document.createElement('li');
-                    listItem.className = 'list-group-item list-group-item';
-                    listItem.innerHTML = `
+                    if (file.isValid == true && file.isListedForSale == true) {
+
+                        const listItem = document.createElement('li');
+                        listItem.className = 'list-group-item list-group-item';
+                        listItem.innerHTML = `
         <div class="d-flex w-100 justify-content-between ">
-                    <small class="text-body-secondary">id: -</small>
+                    <small class="text-body-secondary">id: ${file.tokenID}</small>
                     <h6 class="mb-1">${file.fileName}</h6> 
-                    <p class="mb-1" style="color: red">Validity: ${file.isValid}</p>
+                    <p class="mb-1" style="color: green">Validity: ${file.isValid}</p>
                 </div>
                 
                 <br />
@@ -91,11 +75,14 @@ function fetchFileList() {
                 <br />
                 <small class="text-body-secondary">Owner: ${file.tokenOwner}</small>
                 <br />
+                <small class="text-body-secondary">Is listed for Sale: ${file.isListedForSale}</small>
                 <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                <button id="btnSellCertificate" type="button" class="btn btn-warning btn-sm disabled"  style="margin-bottom: 10px;">Sell Certificate</button>
+                <button id="btnSellCertificate" type="button" class="btn btn-success btn-sm " style="margin-bottom: 10px;">Buy Certificate</button>
                 </div>         
-      `;
-                    listGroup.appendChild(listItem);
+                `;
+                        listGroup.appendChild(listItem);
+
+                    }
                 }
             });
 
@@ -115,4 +102,5 @@ async function listingFinished() {
 }
 
 // Call this function when the page loads or at an appropriate time
-fetchFileList();
+document.addEventListener('adminCheckComplete', fetchFileList);
+//fetchFileList();

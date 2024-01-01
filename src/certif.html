@@ -11,10 +11,27 @@
     <style>
         body {
             padding: 20px;
-            background-image: url('./img/bg2.jpg');
-            background-size: cover;
-            background-repeat: no-repeat;
+            background: linear-gradient(to right, #0062E6, #33AEFF, #8A54FF, #D11AFF);
+            background-size: 200% 200%;
+            animation: gradientAnimation 15s ease infinite;
+            height: 100%;
+            margin: 0;
+            justify-content: center;
+            align-items: center;
+        }
 
+        @keyframes gradientAnimation {
+            0% {
+                background-position: 100% 0%;
+            }
+
+            50% {
+                background-position: 0% 100%;
+            }
+
+            100% {
+                background-position: 100% 0%;
+            }
         }
 
         h1 {
@@ -60,6 +77,39 @@
     <div class="container" style="background-color: rgba(255, 255, 255, 0.697); padding: 20px; border-radius: 10px; ">
         <div id="liveAlertPlaceholder"></div>
 
+        <div class="d-flex justify-content-center">
+            <div id="loadingSpinner" class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">BH</span>
+            </div>
+        </div>
+
+        <!-- Modal -->
+        <div class="modal fade" id="priceModal" tabindex="-1" aria-labelledby="priceModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <form id="priceModalForm">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="priceModalLabel">Set Certificate Price in ETH</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <h6>Token ID: <span id="modalTokenID"></span></h6>
+                            <input type="hidden" id="hiddenModalTokenID" name="tokenID" value="">
+                            <div class="input-group">
+                                <input id="priceInput" type="text" class="form-control" aria-label="ETH amount"
+                                    required>
+                                <span class="input-group-text">ETH</span>
+                                <span class="input-group-text">0.0000000</span>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                            </div>
+                        </div>
+                </form>
+            </div>
+        </div>
+
+
         <div class="list-group">
 
         </div>
@@ -70,6 +120,10 @@
         crossorigin="anonymous"></script>
     <script src="accountMonitor.js"></script>
     <script src="listCertificates.js"></script>
+    <script src="sellCertificate.js"></script>
 </body>
+<footer>
+    <p style="color: white; text-align: center;">© 2023-2024 BLOCKCHAIN HYDROGEN by Nicola COSI</p>
+</footer>
 
 </html>

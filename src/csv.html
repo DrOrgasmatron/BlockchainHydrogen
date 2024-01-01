@@ -11,10 +11,27 @@
     <style>
         body {
             padding: 20px;
-            background-image: url('./img/bg2.jpg');
-            background-size: cover;
-            background-repeat: no-repeat;
+            background: linear-gradient(to right, #0062E6, #33AEFF, #8A54FF, #D11AFF);
+            background-size: 200% 200%;
+            animation: gradientAnimation 15s ease infinite;
+            height: 100%;
+            margin: 0;
+            justify-content: center;
+            align-items: center;
+        }
 
+        @keyframes gradientAnimation {
+            0% {
+                background-position: 100% 0%;
+            }
+
+            50% {
+                background-position: 0% 100%;
+            }
+
+            100% {
+                background-position: 100% 0%;
+            }
         }
 
         h1 {
@@ -67,6 +84,12 @@
 
         <div id="liveAlertPlaceholder"></div>
 
+        <div class="d-flex justify-content-center">
+            <div id="loadingSpinner" class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">BH</span>
+            </div>
+        </div>
+
         <div class="list-group">
 
         </div>
@@ -80,5 +103,6 @@
     <script src="listCSV.js"></script>
     <script src="callFunctions.js"></script>
 </body>
+<p style="color: white; text-align: center;">© 2023-2024 BLOCKCHAIN HYDROGEN by Nicola COSI</p>
 
 </html>

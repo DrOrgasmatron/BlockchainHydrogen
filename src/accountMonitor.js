@@ -6,6 +6,9 @@ const contractAddress = '0x9d6F63ca01be1f5a0f790Be32cD4cFa12d29754F'; // Sepolia
 const abi = require('../artifacts/contracts/CSVMint.sol/CSVMint.json').abi;
 
 let contract;
+let isUserAdminGlobal = false;
+
+
 
 const alertPlaceholder = document.getElementById('liveAlertPlaceholder')
 const appendAlert = (message, type) => {
@@ -42,15 +45,27 @@ function handleAccountsChanged(accounts) {
 // Function to check if the user is an admin and redirect
 async function checkUserRoleAndRedirect(account) {
     try {
+        document.getElementById('loadingSpinner').style.display = '';
+
         initContract();
         const DEFAULT_ADMIN_ROLE = ethers.utils.id("MINTER_ROLE");
         const isAdmin = await contract.hasRole(DEFAULT_ADMIN_ROLE, account);
         // Prevent redirection loop by checking if the location is already where it needs to be
         if (!isAdmin && window.location.pathname !== '/tokenSale.html') {
             appendAlert('You do not have the persmission', 'Error')
-            window.location.href = 'tokenSale.html';
+            // After checking the role...
+            document.dispatchEvent(new CustomEvent('adminCheckComplete', { detail: isUserAdminGlobal }));
 
+            window.location.href = 'tokenSale.html';
         }
+
+        isUserAdminGlobal = isAdmin;
+        // After checking the role...
+        document.dispatchEvent(new CustomEvent('adminCheckComplete', { detail: isUserAdminGlobal }));
+
+
+
+
     } catch (error) {
         console.error('Error checking if user is admin:', error);
     }

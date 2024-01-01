@@ -60,11 +60,14 @@ function fetchFileList() {
       `;
                     listGroup.appendChild(listItem);
                 }
-
             });
-
+            hideSpinner();
         })
         .catch(error => console.error('Error fetching file list:', error));
+}
+
+function hideSpinner() {
+    document.getElementById('loadingSpinner').style.display = 'none';
 }
 
 // Call this function when the page loads or at an appropriate time
