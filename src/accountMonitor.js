@@ -37,6 +37,7 @@ function handleAccountsChanged(accounts) {
     } else if (accounts[0] !== currentAccount) {
         currentAccount = accounts[0]; // Update the current account
         console.log('Selected account changed to:', currentAccount);
+        document.dispatchEvent(new CustomEvent('currentAccountEvent', { detail: currentAccount }));
         // Proceed with checking the user's role and redirecting
         checkUserRoleAndRedirect(currentAccount);
     }
@@ -51,12 +52,14 @@ async function checkUserRoleAndRedirect(account) {
         const DEFAULT_ADMIN_ROLE = ethers.utils.id("MINTER_ROLE");
         const isAdmin = await contract.hasRole(DEFAULT_ADMIN_ROLE, account);
         // Prevent redirection loop by checking if the location is already where it needs to be
-        if (!isAdmin && window.location.pathname !== '/tokenSale.html') {
-            appendAlert('You do not have the persmission', 'Error')
-            // After checking the role...
-            document.dispatchEvent(new CustomEvent('adminCheckComplete', { detail: isUserAdminGlobal }));
+        if (!isAdmin) {
+            if (window.location.pathname == '/certif.html' || window.location.pathname == '/csv.html') {
+                appendAlert('You do not have the persmission', 'Error')
+                // After checking the role...
+                document.dispatchEvent(new CustomEvent('adminCheckComplete', { detail: isUserAdminGlobal }));
 
-            window.location.href = 'tokenSale.html';
+                window.location.href = 'tokenSale.html';
+            }
         }
 
         isUserAdminGlobal = isAdmin;

@@ -33,8 +33,11 @@ function fetchFileList() {
                 console.log('File:', file);
 
 
+
                 if (isUserAdminGlobal == true) {
                     if (file.isValid == true && file.isListedForSale == true) {
+                        // Convert wei to ether
+                        const priceInEther = ethers.utils.formatUnits(file.tokenPrice, 'ether');
 
                         const listItem = document.createElement('li');
                         listItem.className = 'list-group-item list-group-item';
@@ -51,15 +54,20 @@ function fetchFileList() {
                 <small class="text-body-secondary">Owner: ${file.tokenOwner}</small>
                 <br />
                 <small class="text-body-secondary">Is listed for Sale: ${file.isListedForSale}</small>
+               
                 <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                <button id="btnSellCertificate" type="button" class="btn btn-danger btn-sm" data-tokenID="${file.tokenID}"  style="margin-bottom: 10px;">CANCEL SALE</button>
+                 <small class="text-body-secondary">Price: ${priceInEther}ETH</small>
+                <button id="btnCancelCertificateSale" type="button" class="btn btn-danger btn-sm" data-tokenID="${file.tokenID}"  style="margin-bottom: 10px;">CANCEL SALE</button>
                 </div>         
                 `;
                         listGroup.appendChild(listItem);
                     }
                 }
                 else {
+
                     if (file.isValid == true && file.isListedForSale == true) {
+                        // Convert wei to ether
+                        const priceInEther = ethers.utils.formatUnits(file.tokenPrice, 'ether');
 
                         const listItem = document.createElement('li');
                         listItem.className = 'list-group-item list-group-item';
@@ -77,7 +85,8 @@ function fetchFileList() {
                 <br />
                 <small class="text-body-secondary">Is listed for Sale: ${file.isListedForSale}</small>
                 <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                <button id="btnSellCertificate" type="button" class="btn btn-success btn-sm " style="margin-bottom: 10px;">Buy Certificate</button>
+                <small class="text-body-secondary">Price: ${priceInEther}ETH</small>
+                <button id="btnBuyCertificate" type="button" class="btn btn-info btn-sm" data-tokenID="${file.tokenID}" data-tokenPrice="${priceInEther}" style="margin-bottom: 10px;">Buy Certificate</button>
                 </div>         
                 `;
                         listGroup.appendChild(listItem);

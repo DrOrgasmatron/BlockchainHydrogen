@@ -1,3 +1,5 @@
+// Description: This file contains the functions that call the API endpoints for the CSV and Certificate creation in csv.html
+
 const alertPlaceholder = document.getElementById('liveAlertPlaceholder')
 const appendAlert = (message, type) => {
     const wrapper = document.createElement('div')
@@ -13,6 +15,7 @@ const appendAlert = (message, type) => {
 
 document.getElementById('btnCreateCSV').addEventListener('click', function () {
     console.log('Create CSV Button clicked');
+    showSpinner();
     fetch('https://hka780hii3.execute-api.eu-central-1.amazonaws.com/beta/machines', {
         method: 'POST',
         headers: {
@@ -25,11 +28,15 @@ document.getElementById('btnCreateCSV').addEventListener('click', function () {
     })
         .then(response => response.json())
         .then(data => console.log(data))
+        .then(appendAlert('The csv file was created', 'success'))
+        .then(hideSpinner())
         .catch(error => console.error('Error:', error));
-    appendAlert('The csv file was created', 'success');
+
 });
 
 document.getElementById('btnCreateCertificate').addEventListener('click', function () {
+    console.log('Create Certificate Button clicked');
+    showSpinner();
     const selectedFiles = [];
 
     document.querySelectorAll('.list-group-item input[type="checkbox"]:checked').forEach((checkbox) => {
@@ -62,12 +69,20 @@ document.getElementById('btnCreateCertificate').addEventListener('click', functi
             .then(data => {
                 console.log(data);
                 appendAlert('The certificate was created', 'success');
+                hideSpinner();
             })
             .catch(error => {
                 console.error('Error:', error);
                 appendAlert('Error creating the certificate', 'danger');
+                hideSpinner();
             });
     }
 
 });
 
+function hideSpinner() {
+    document.getElementById('loadingSpinner').style.display = 'none';
+}
+function showSpinner() {
+    document.getElementById('loadingSpinner').style.display = '';
+}

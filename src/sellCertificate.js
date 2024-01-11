@@ -61,40 +61,51 @@ async function setupSellCertificates() {
     });
 }
 
-// Get the price from the modal when the user submits
+async function approveAndListToken(tokenID, priceWEI) {
+    try {
+        // Initialize contracts
+        await initContract();
+
+        // Approve the market contract to transfer the token on behalf of the owner
+        const approvalTx = await contractCertif.approve(contractMarketAddress, tokenID);
+
+        // Wait for the approval transaction to be mined
+        await approvalTx.wait();
+
+        // List the NFT for sale after approval is confirmed
+        const listTx = await contractMarket.listTokenForSale(tokenID, priceWEI);
+        await listTx.wait(); // Wait for the listing transaction to be mined
+
+        console.log('Token successfully listed for sale.');
+        appendAlert('The certificate was put on sale', 'success');
+    } catch (error) {
+        console.error('Error in approveAndListToken:', error);
+        appendAlert('Error putting the certificate on sale', 'danger');
+    }
+}
+
+// And then use this function in your form submit handler
 document.getElementById('priceModalForm').addEventListener('submit', async function (event) {
     event.preventDefault();
+    showSpinner();
     const price = document.getElementById('priceInput').value;
     const priceWEI = ethers.utils.parseEther(price.toString());
-
     const tokenID = document.getElementById('hiddenModalTokenID').value;
 
-    console.log(tokenID, priceWEI);
-
-    await initContract();
-    await contractCertif.approve(contractMarketAddress, tokenID)
-        .then((result) => {
-            console.log(result);
-        })
-        .catch((error) => {
-            console.error(error);
-        });
-
-    // List the NFT for sale
-    await contractMarket.listTokenForSale(tokenID, priceWEI)
-        .then((result) => {
-            console.log(result);
-            appendAlert('The certificate was put on sale', 'success');
-        })
-        .catch((error) => {
-            console.error(error);
-            appendAlert('Error putting the certificate on sale', 'danger');
-        });
+    // Call the function to handle approval and listing
+    await approveAndListToken(tokenID, priceWEI);
 
     // Close the Bootstrap Modal
+    hideSpinner();
     priceModal.hide();
 });
 
+function hideSpinner() {
+    document.getElementById('loadingSpinnerModal').style.display = 'none';
+}
+function showSpinner() {
+    document.getElementById('loadingSpinnerModal').style.display = '';
+}
 
 // Listen for the custom event before setting up the sell buttons
 document.addEventListener('certificatesListed', setupSellCertificates);

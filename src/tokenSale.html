@@ -41,9 +41,7 @@
         }
 
 
-        .btn-danger {
-            width: 100%;
-        }
+
 
         form {
             border-style: solid;
@@ -70,6 +68,9 @@
             <li class="nav-item">
                 <a class="nav-link active" aria-current="page" href="/tokenSale.html">Token Sale</a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link " aria-current="page" href="/myTokens.html">My Tokens</a>
+            </li>
         </ul>
     </div>
 </head>
@@ -84,26 +85,44 @@
             </div>
         </div>
 
-        <!-- Modal -->
-        <div class="modal fade" id="priceModal" tabindex="-1" aria-labelledby="priceModalLabel" aria-hidden="true">
+        <!-- Cancel Modal -->
+        <div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
             <div class="modal-dialog">
-                <form id="priceModalForm">
+                <form id="cancelModalForm">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="priceModalLabel">Set Certificate Price in ETH</h5>
+                            <h5 class="modal-title" id="cancelModalLabel">CANCEL TOKEN SALE</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                            <h6>Token ID: <span id="modalTokenID"></span></h6>
-                            <input type="hidden" id="hiddenModalTokenID" name="tokenID" value="">
-                            <div class="input-group">
-                                <input id="priceInput" type="text" class="form-control" aria-label="ETH amount"
-                                    required>
-                                <span class="input-group-text">ETH</span>
-                                <span class="input-group-text">0.0000000</span>
-                            </div>
+                            <h6>ARE YOU SURE YOU WANT TO CANCEL TOKEN N° <span id="cancelModalTokenID"></span> SALE?
+                            </h6>
+                            <input type="hidden" id="cancelHiddenModalTokenID" name="tokenID" value="">
                             <div class="modal-footer">
-                                <button type="submit" class="btn btn-primary">Submit</button>
+                                <button type="button" data-bs-dismiss="modal" class="btn btn-secondary">exit</button>
+                                <button type="submit" class="btn btn-warning">CANCEL SALE</button>
+                            </div>
+                        </div>
+                </form>
+            </div>
+        </div>
+        <!-- Buy Modal -->
+        <div class="modal fade" id="buyModal" tabindex="-1" aria-labelledby="buyModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <form id="buyModalForm">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="buyModalLabel">Buy Certificate Token</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <h6>Are you sure you want to buy Token n° <span id="buyModalTokenID"></span> for <span
+                                    id="buyModalTokenPrice"></span>ETH?</h6>
+                            <input type="hidden" id="buyHiddenModalTokenID" name="tokenID" value="">
+                            <input type="hidden" id="buyHiddenModalTokenPrice" name="tokenPrice" value="">
+                            <div class="modal-footer">
+                                <button type="button" data-bs-dismiss="modal" class="btn btn-secondary">exit</button>
+                                <button type="submit" class="btn btn-success">BUY TOKEN</button>
                             </div>
                         </div>
                 </form>
@@ -122,6 +141,7 @@
         crossorigin="anonymous"></script>
     <script src="accountMonitor.js"></script>
     <script src="listCertificatesOnSale.js"></script>
+    <script src="buyOrCancelCertificateSale.js"></script>
 
 </body>
 <p style="color: white; text-align: center;">© 2023-2024 BLOCKCHAIN HYDROGEN by Nicola COSI</p>
