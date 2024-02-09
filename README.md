@@ -8,6 +8,7 @@ BlockchainHydrogen is a TM Project 2023 that implements a blockchain-based syste
   - [Description](#description)
   - [Installation](#installation)
   - [Usage](#usage)
+  - [Miscellaneous](#miscellaneous)
 
 
 
@@ -35,4 +36,9 @@ cd BlockchainHydrogen
 npm install
 
 ## Usage
-For a complete guide on how to use the project, please read the "User Guide" Section in the report.
+For a complete guide on how to use the project, please read the "User Guide" document in the appendices.
+
+The link for the application can be found in the appendices of the report.
+
+## Miscellaneous
+The files for the frontend containend in this repository are relevant only if the frontend is run locally. The files for the actual frontend are hosted in the AWS S3 bucket. The frontends are the same, but the backend files are slightly modified to accomodate AWS specific requirements.
